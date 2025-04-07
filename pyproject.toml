@@ -1,0 +1,25 @@
+[project]
+name = "sipin-mh-sip-creator-v2"
+version = "0.0.1"
+description = "Service that creates a Mediahaven SIP."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "viaa-chassis"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--rootdir=./app/ -v"
+testpaths = ["tests"]
