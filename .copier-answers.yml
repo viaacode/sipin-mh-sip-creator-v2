@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_commit: f691f9e
+_commit: b2bacb1
 _src_path: https://github.com/viaacode/meemoo-python-service-template
 project_description: Service that creates a Mediahaven SIP.
 project_name: sipin-mh-sip-creator-v2
