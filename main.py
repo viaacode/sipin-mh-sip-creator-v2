@@ -1,1 +1,1 @@
-print(f"New project with name ")
+print(f"New project with name sipin-mh-sip-creator-v2")

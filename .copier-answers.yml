@@ -1,7 +1,10 @@
 # Changes here will be overwritten by Copier
-_commit: 2f16c3e
+_commit: f691f9e
 _src_path: https://github.com/viaacode/meemoo-python-service-template
-is_pulsar: false
 project_description: Service that creates a Mediahaven SIP.
 project_name: sipin-mh-sip-creator-v2
 python_version: '3.12'
+uses_db: false
+uses_mediahaven: false
+uses_pulsar: true
+uses_s3: false
