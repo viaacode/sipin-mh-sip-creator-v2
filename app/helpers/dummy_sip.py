@@ -387,10 +387,3 @@ events = [
         source=[Reference(id="uuid-5defe23d-23b9-4819-a189-bc4793e7e60b")],
     ),
 ]
-
-
-digi_reps = [
-    repr for repr in f.is_represented_by if isinstance(repr, DigitalRepresentation)
-]
-
-print(f"Found {len(digi_reps)} digital representations.")
