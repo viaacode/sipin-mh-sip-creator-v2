@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:premis="http://www.loc.gov/premis/v3"
+  xmlns:revtmd="http://nwtssite.nwts.nara/schema/" xmlns:viaa="http://viaa.be"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd
+                      http://nwtssite.nwts.nara/schema/ http://www.archives.gov/preservation/products/reVTMD.xsd
+                      info:lc/xmlns/premis-v2 http://www.loc.gov/standards/premis/premis.xsd">
+  
+  {% include "header.jinja" %}
+  {% include "dmd_sections.jinja" %}
+  {# {% include "amd_sections.jinja" %} #}
+  {% include "file_section.jinja" %}
+  {% if profile == "film" %}
+    {% include "profiles/film_struct_map.jinja" %}
+  {% endif %}
+</mets:mets>
