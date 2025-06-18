@@ -3,6 +3,7 @@ from viaa.configuration import ConfigParser
 from viaa.observability import logging
 
 from app.services.pulsar import PulsarClient
+from app.services.pid import PidClient
 
 import os
 import shutil
@@ -35,6 +36,8 @@ class EventListener:
 
         self.log = logging.get_logger(__name__, config=config_parser)
         self.pulsar_client = PulsarClient()
+        self.pid_client = PidClient()
+
         self.app_config = self.config["mh-sip-creator"]
 
     def handle_incoming_message(self, event: Event):
@@ -63,10 +66,16 @@ class EventListener:
         
         # todo: deserialize sip_metadata to a real SIP.py object
         # For now, we will use a dummy SIP object for testing purposes
+        # json_ld_graph = json.loads(graph_string)["@graph"]
+
+        # for model, model_dict in zip(models, json_ld_graph):
+        #     deserialized = model.__class__.model_validate(model_dict)
+        
+
         
         sip = f
         
-        pid = "testpid"
+        pid = self.pid_client.get_pid()
 
         files_path = Path(self.app_config["aip_folder"], pid)
         files_path.mkdir(parents=True, exist_ok=True)
