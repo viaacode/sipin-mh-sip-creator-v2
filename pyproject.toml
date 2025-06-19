@@ -9,6 +9,7 @@ dependencies = [
     "pulsar-client",
     "meemoo-cloudevents",
     "SIP.py",
+    "requests",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
