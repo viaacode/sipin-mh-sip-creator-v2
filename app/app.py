@@ -111,7 +111,7 @@ class EventListener:
         for representation_index, representation in enumerate(sip.is_represented_by):
             if isinstance(representation, DigitalRepresentation):
                 shutil.copytree(
-                    Path(subject, f"data/representations/representation_{representation_index+1}/data"),
+                    Path(subject, f"representations/representation_{representation_index+1}/data"),
                     Path(files_path, f"representation_{representation_index+1}"),
                     copy_function=shutil.move,
                 )
