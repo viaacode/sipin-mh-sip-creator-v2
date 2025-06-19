@@ -149,7 +149,7 @@ class EventListener:
             "metadata": mets_xml,
             "message": f"AIP created: MH2.0 complex created for {event_attributes.get("subject")}",
         }
-        producer_topic = self.config["pulsar"]["producer_topic_complex"]
+        producer_topic = self.config["pulsar"]["producer_topic"]
 
         self.log.info(data["message"], pid=pid)
         self.produce_event(
