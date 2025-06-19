@@ -1,0 +1,55 @@
+{% if events %}
+<mets:amdSec ID="EVENTS">
+  {% for event in events %}
+  <mets:digiprovMD ID="{{ event.id }}">
+    <mets:mdWrap MDTYPE="PREMIS:EVENT">
+      <mets:xmlData>
+        <premis:event>
+          {% if event.identifier %}
+          <premis:eventIdentifier>
+            <premis:eventIdentifierType>{{ event.identifier.type }}</premis:eventIdentifierType>
+            <premis:eventIdentifierValue>{{ event.identifier.value }}</premis:eventIdentifierValue>
+          </premis:eventIdentifier>
+          {% endif %}
+          
+          {% if event.type %}
+          <premis:eventType>{{ event.type }}</premis:eventType>
+          {% endif %}
+          
+          {% if event.date %}
+          <premis:eventDateTime>{{ event.date }}</premis:eventDateTime>
+          {% endif %}
+          
+          {% if event.detail %}
+          <premis:eventDetail>{{ event.detail }}</premis:eventDetail>
+          {% endif %}
+          
+          {% if event.outcome %}
+          <premis:eventOutcomeInformation>
+            <premis:eventOutcome>{{ event.outcome.value }}</premis:eventOutcome>
+            {% if event.outcome.detail %}
+            <premis:eventOutcomeDetail>
+              <premis:eventOutcomeDetailNote>{{ event.outcome.detail }}</premis:eventOutcomeDetailNote>
+            </premis:eventOutcomeDetail>
+            {% endif %}
+          </premis:eventOutcomeInformation>
+          {% endif %}
+          
+          {% if event.agents %}
+          {% for agent in event.agents %}
+          <premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifierType>{{ agent.type }}</premis:linkingAgentIdentifierType>
+            <premis:linkingAgentIdentifierValue>{{ agent.value }}</premis:linkingAgentIdentifierValue>
+            {% if agent.role %}
+            <premis:linkingAgentRole>{{ agent.role }}</premis:linkingAgentRole>
+            {% endif %}
+          </premis:linkingAgentIdentifier>
+          {% endfor %}
+          {% endif %}
+        </premis:event>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:digiprovMD>
+  {% endfor %}
+</mets:amdSec>
+{% endif %}

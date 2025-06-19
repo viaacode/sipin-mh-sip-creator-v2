@@ -8,6 +8,7 @@ dependencies = [
     "viaa-chassis",
     "pulsar-client",
     "meemoo-cloudevents",
+    "SIP.py",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -25,3 +26,7 @@ dev = [
 minversion = "6.0"
 addopts = "--rootdir=./app/ -v"
 testpaths = ["tests"]
+
+[[tool.mypy.overrides]]
+module = ["untyped_package.*"]
+follow_untyped_imports = true
