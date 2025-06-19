@@ -124,6 +124,12 @@ class EventListener:
         except Exception as e:
             self.log.error(f"Failed to generate METS XML: {e}")
             
+        with zipfile.ZipFile(str(Path(f"{files_path}.zip")), "w") as zf:
+            for file_path in files_path.rglob("*"):
+                zf.write(file_path, arcname=file_path.relative_to(files_path))
+        # Remove files folder
+        shutil.rmtree(files_path)
+            
         # Send event on topic
         data = {
             "source": files_path,
@@ -143,7 +149,7 @@ class EventListener:
 
         self.log.info(data["message"], pid=pid)
         self.produce_event(
-            producer_topic, data, path, EventOutcome.SUCCESS, event.correlation_id
+            producer_topic, data, subject, EventOutcome.SUCCESS, event.correlation_id
         )
 
     def start_listening(self):
