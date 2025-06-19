@@ -2,7 +2,7 @@
     <mets:fileGrp USE="Original">
         {% for file in files %}
         <mets:file ID="{{ file.id }}" CHECKSUM="{{ file.checksum }}" CHECKSUMTYPE="MD5" USE="Disk">
-            <mets:FLocat xlink:href="{{ file.original_name }}" LOCTYPE="URL" />
+            <mets:FLocat xlink:href="representation_{{ file.representation_index + 1}}/{{ file.original_name }}" LOCTYPE="URL" />
         </mets:file>
         {% endfor %}
         <mets:file ID="FILEID-FILM-METS" USE="Disk">
