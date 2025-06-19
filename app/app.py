@@ -38,7 +38,6 @@ class EventListener:
         self.pulsar_client = PulsarClient()
         self.pid_client = PidClient()
 
-        self.app_config = self.config["mh-sip-creator"]
         
     def produce_event(
         self,
@@ -102,7 +101,7 @@ class EventListener:
         
         pid = self.pid_client.get_pid()
 
-        files_path = Path(self.app_config["aip_folder"], pid)
+        files_path = Path(self.config["aip_folder"], pid)
         files_path.mkdir(parents=True, exist_ok=True)
 
         for i in range(len(sip.representations)):
@@ -145,7 +144,7 @@ class EventListener:
             "metadata": mets_xml,
             "message": f"AIP created: MH2.0 complex created for {event_attributes.get("subject")}",
         }
-        producer_topic = self.app_config["producer_topic_complex"]
+        producer_topic = self.config["pulsar"]["producer_topic_complex"]
 
         self.log.info(data["message"], pid=pid)
         self.produce_event(
