@@ -23,7 +23,8 @@ def generate_mets_from_sip(sip: IntellectualEntity, pid: str) -> str:
     """
     template = get_jinja_template()
     
-    profile = str(sip.type).lstrip("EntityClass.")
+    profile = "film"
+    # profile = str(sip.type).lstrip("EntityClass.")
         
     files = []
     for representation_index, representation in enumerate(sip.is_represented_by):
