@@ -91,14 +91,14 @@ class EventListener:
         
         sip_metadata = event_data["metadata"]
         
-        # todo: deserialize sip_metadata to a real SIP.py object
-        # For now, we will use a dummy SIP object for testing purposes
-        # json_ld_graph = json.loads(graph_string)["@graph"]
+        json_ld_graph = json.loads(sip_metadata)["@graph"]
 
-        # for model, model_dict in zip(models, json_ld_graph):
-        #     deserialized = model.__class__.model_validate(model_dict)
-        
-        sip = f
+        deserialized_models = []
+        for model, model_dict in zip([f], json_ld_graph):
+            deserialized = model.__class__.model_validate(model_dict)
+            deserialized_models.append(deserialized)
+
+        sip = deserialized_models[0]
         
         pid = self.pid_client.get_pid()
 
