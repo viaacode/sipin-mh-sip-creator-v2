@@ -18,6 +18,10 @@ from app.helpers.template import generate_mets_from_sip
 
 from app.helpers.dummy_sip import f
 
+from sippy.objects import (
+    DigitalRepresentation
+)
+
 
 APP_NAME = "sipin-mh-sip-creator-v2"
 
@@ -104,12 +108,13 @@ class EventListener:
         files_path = Path(self.config["aip_folder"], pid)
         files_path.mkdir(parents=True, exist_ok=True)
 
-        for i in range(len(sip.representations)):
-            shutil.copytree(
-                Path(subject, f"data/representations/representation_{i+1}/data"),
-                Path(files_path, f"representation_{i+1}"),
-                copy_function=shutil.move,
-            )
+        for representation_index, representation in enumerate(sip.is_represented_by):
+            if isinstance(representation, DigitalRepresentation):
+                shutil.copytree(
+                    Path(subject, f"data/representations/representation_{representation_index+1}/data"),
+                    Path(files_path, f"representation_{representation_index+1}"),
+                    copy_function=shutil.move,
+                )
 
         mets_xml = generate_mets_from_sip(sip, pid)
 
