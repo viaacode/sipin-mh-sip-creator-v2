@@ -136,7 +136,7 @@ class EventListener:
             
         # Send event on topic
         data = {
-            "source": files_path,
+            "source": str(files_path),
             "host": self.config["host"],
             "paths": [
                 str(Path(f"{files_path}.zip")),
