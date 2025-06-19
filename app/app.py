@@ -1,4 +1,4 @@
-from cloudevents.events import Event, PulsarBinding
+from cloudevents.events import Event, PulsarBinding, EventOutcome, EventAttributes
 from viaa.configuration import ConfigParser
 from viaa.observability import logging
 
@@ -39,6 +39,33 @@ class EventListener:
         self.pid_client = PidClient()
 
         self.app_config = self.config["mh-sip-creator"]
+        
+    def produce_event(
+        self,
+        topic: str,
+        data: dict,
+        subject: str,
+        outcome: EventOutcome,
+        correlation_id: str,
+    ):
+        """Produce an event on a Pulsar topic.
+        Args:
+            topic: The topic to send the cloudevent to.
+            data: The data payload.
+            subject: The subject of the event.
+            outcome: The attributes outcome of the Event.
+            correlation_id: The correlation ID.
+        """
+        attributes = EventAttributes(
+            type=topic,
+            source=APP_NAME,
+            subject=subject,
+            correlation_id=correlation_id,
+            outcome=outcome,
+        )
+
+        event = Event(attributes, data)
+        self.pulsar_client.produce_event(topic, event)
 
     def handle_incoming_message(self, event: Event):
         """
@@ -71,8 +98,6 @@ class EventListener:
         # for model, model_dict in zip(models, json_ld_graph):
         #     deserialized = model.__class__.model_validate(model_dict)
         
-
-        
         sip = f
         
         pid = self.pid_client.get_pid()
@@ -87,10 +112,9 @@ class EventListener:
                 copy_function=shutil.move,
             )
 
+        mets_xml = generate_mets_from_sip(sip, pid)
+
         try:
-
-            mets_xml = generate_mets_from_sip(sip, pid)
-
             # Save the generated XML to a file
             mets_file_path = files_path / "mets.xml"
             with open(mets_file_path, "w") as mets_file:
@@ -99,6 +123,28 @@ class EventListener:
             self.log.info(f"Generated METS XML file at {mets_file_path}")
         except Exception as e:
             self.log.error(f"Failed to generate METS XML: {e}")
+            
+        # Send event on topic
+        data = {
+            "source": files_path,
+            "host": self.config["host"],
+            "paths": [
+                str(Path(f"{files_path}.zip")),
+            ],
+            "cp_id": sip.maintainer.identifier,
+            "type": "complex",
+            "sip_profile": str(sip.type).lstrip("EntityClass."),
+            "pid": pid,
+            "outcome": EventOutcome.SUCCESS,
+            "metadata": mets_xml,
+            "message": f"AIP created: MH2.0 complex created for {event_attributes.get("subject")}",
+        }
+        producer_topic = self.app_config["producer_topic_complex"]
+
+        self.log.info(data["message"], pid=pid)
+        self.produce_event(
+            producer_topic, data, path, EventOutcome.SUCCESS, event.correlation_id
+        )
 
     def start_listening(self):
         """
