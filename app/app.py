@@ -5,22 +5,17 @@ from viaa.observability import logging
 from app.services.pulsar import PulsarClient
 from app.services.pid import PidClient
 
-import os
 import shutil
-import uuid
 import zipfile
-from datetime import datetime
 from pathlib import Path
-import json
-from jinja2 import Environment, FileSystemLoader
 
 from app.helpers.template import generate_mets_from_sip
-
-from app.helpers.dummy_sip import f
 
 from sippy.objects import (
     DigitalRepresentation
 )
+
+from sippy.sip import SIP
 
 
 APP_NAME = "sipin-mh-sip-creator-v2"
@@ -90,18 +85,7 @@ class EventListener:
             return
         self.log.info(f"Start handling of {subject}.")
         
-        event_data = event.get_data()
-        
-        sip_metadata = event_data["metadata"]
-        
-        json_ld_graph = json.loads(sip_metadata)["@graph"]
-
-        deserialized_models = []
-        for model, model_dict in zip([f], json_ld_graph):
-            deserialized = model.__class__.model_validate(model_dict)
-            deserialized_models.append(deserialized)
-
-        sip = deserialized_models[0]
+        sip = SIP.deserialize(event.get_data()["data"])
         
         pid = self.pid_client.get_pid()
 

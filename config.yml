@@ -11,3 +11,7 @@ app:
         producer_topic: !ENV ${MH_SIP_COMPLEX_PRODUCER_TOPIC}
     pid:
         url: !ENV ${PID_URL}
+    storage:
+        default_archive_location: !ENV ${DEFAULT_ARCHIVE_LOCATION}
+        tape_content_partners: !ENV ${TAPE_CONTENT_PARTNERS}
+        disk_content_partners: !ENV ${DISK_CONTENT_PARTNERS}

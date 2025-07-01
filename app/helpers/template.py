@@ -6,8 +6,9 @@ from jinja2 import Environment, FileSystemLoader
 from sippy.objects import (
     DigitalRepresentation,
     File,
-    IntellectualEntity
 )
+
+from sippy.sip import SIP
 
 
 def get_jinja_template():
@@ -16,15 +17,46 @@ def get_jinja_template():
     
     return env.get_template("base.jinja")
 
+def determine_archive_location(self, sip: SIP) -> str:
+    """
+    Determines the archive location for the SIP based on its maintainer.
+    
+    Args:
+        sip (SIP): The SIP object containing metadata.
+    
+    Returns:
+        str: The archive location path.
+    """
+    cp_id = sip.maintainer.identifier
+    archive_location = self.config["storage"]["default_archive_location"]
 
-def generate_mets_from_sip(sip: IntellectualEntity, pid: str) -> str:
+    tape_content_partners = [
+        or_id.strip().lower()
+        for or_id in self.config["storage"]["tape_content_partners"].split(",")
+    ]
+    disk_content_partners = [
+        or_id.strip().lower()
+        for or_id in self.config["storage"]["disk_content_partners"].split(",")
+    ]
+
+    if cp_id.lower() in tape_content_partners:
+        archive_location = "Tape"
+    if cp_id.lower() in disk_content_partners:
+        archive_location = "Disk"
+        
+    return archive_location
+
+
+def generate_mets_from_sip(sip: SIP, pid: str) -> str:
     """
     Generate a METS XML file from a SIP instance.
     """
     template = get_jinja_template()
     
-    profile = "film"
-    # profile = str(sip.type).lstrip("EntityClass.")
+    profile = str(sip.profile).split("/")[-1]
+    version = str(sip.profile).split("/")[-2]
+    
+    archive_location = determine_archive_location(sip)
         
     files = []
     for representation_index, representation in enumerate(sip.is_represented_by):
@@ -58,7 +90,8 @@ def generate_mets_from_sip(sip: IntellectualEntity, pid: str) -> str:
         "pid": pid,
         "files": files,
         "dmd_sections": dmd_secs,
-        "ie": sip
+        "ie": sip,
+        "archive_location": archive_location,
     }
     
     return template.render(data)
