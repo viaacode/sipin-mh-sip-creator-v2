@@ -17,7 +17,7 @@ def get_jinja_template():
     
     return env.get_template("base.jinja")
 
-def determine_archive_location(self, sip: SIP) -> str:
+def determine_archive_location(sip: SIP) -> str:
     """
     Determines the archive location for the SIP based on its maintainer.
     
