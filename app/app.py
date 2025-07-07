@@ -36,6 +36,35 @@ class EventListener:
         self.log = logging.get_logger(__name__, config=config_parser)
         self.pulsar_client = PulsarClient()
         self.pid_client = PidClient()
+        
+    def determine_archive_location(self, sip: SIP) -> str:
+        """
+        Determines the archive location for the SIP based on its maintainer.
+        
+        Args:
+            sip (SIP): The SIP object containing metadata.
+        
+        Returns:
+            str: The archive location path.
+        """
+        cp_id = sip.entity.maintainer.identifier
+        archive_location = self.config["storage"]["default_archive_location"]
+
+        tape_content_partners = [
+            or_id.strip().lower()
+            for or_id in self.config["storage"]["tape_content_partners"].split(",")
+        ]
+        disk_content_partners = [
+            or_id.strip().lower()
+            for or_id in self.config["storage"]["disk_content_partners"].split(",")
+        ]
+
+        if cp_id.lower() in tape_content_partners:
+            archive_location = "Tape"
+        if cp_id.lower() in disk_content_partners:
+            archive_location = "Disk"
+            
+        return archive_location
 
         
     def produce_event(
@@ -87,6 +116,8 @@ class EventListener:
         
         sip = SIP.deserialize(event.get_data()["data"])
         
+        archive_location = self.determine_archive_location(sip)
+        
         pid = self.pid_client.get_pid()
 
         files_path = Path(self.config["aip_folder"], pid)
@@ -100,7 +131,7 @@ class EventListener:
                     copy_function=shutil.move,
                 )
 
-        mets_xml = generate_mets_from_sip(sip, pid)
+        mets_xml = generate_mets_from_sip(sip, pid, archive_location)
 
         try:
             # Save the generated XML to a file

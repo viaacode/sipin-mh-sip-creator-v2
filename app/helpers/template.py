@@ -17,37 +17,8 @@ def get_jinja_template():
     
     return env.get_template("base.jinja")
 
-def determine_archive_location(sip: SIP) -> str:
-    """
-    Determines the archive location for the SIP based on its maintainer.
-    
-    Args:
-        sip (SIP): The SIP object containing metadata.
-    
-    Returns:
-        str: The archive location path.
-    """
-    cp_id = sip.maintainer.identifier
-    archive_location = self.config["storage"]["default_archive_location"]
 
-    tape_content_partners = [
-        or_id.strip().lower()
-        for or_id in self.config["storage"]["tape_content_partners"].split(",")
-    ]
-    disk_content_partners = [
-        or_id.strip().lower()
-        for or_id in self.config["storage"]["disk_content_partners"].split(",")
-    ]
-
-    if cp_id.lower() in tape_content_partners:
-        archive_location = "Tape"
-    if cp_id.lower() in disk_content_partners:
-        archive_location = "Disk"
-        
-    return archive_location
-
-
-def generate_mets_from_sip(sip: SIP, pid: str) -> str:
+def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str) -> str:
     """
     Generate a METS XML file from a SIP instance.
     """
@@ -56,10 +27,9 @@ def generate_mets_from_sip(sip: SIP, pid: str) -> str:
     profile = str(sip.profile).split("/")[-1]
     version = str(sip.profile).split("/")[-2]
     
-    archive_location = determine_archive_location(sip)
         
     files = []
-    for representation_index, representation in enumerate(sip.is_represented_by):
+    for representation_index, representation in enumerate(sip.entity.is_represented_by):
         if isinstance(representation, DigitalRepresentation):
             for file_index, file in enumerate(representation.includes):
                 if isinstance(file, File):
@@ -71,6 +41,7 @@ def generate_mets_from_sip(sip: SIP, pid: str) -> str:
                         "file_index": file_index,
                         "original_name": file.original_name,
                         "checksum": file.fixity.value,
+                        "archive_location": archive_location,
                     })
         
     dmd_secs = []
@@ -80,7 +51,7 @@ def generate_mets_from_sip(sip: SIP, pid: str) -> str:
             "original_name": file["original_name"],
             "external_id": f"{pid}_{file['representation_index']}_{file['file_index']}",
             "pid": pid,
-            "cp_id": sip.maintainer.identifier,
+            "cp_id": sip.entity.maintainer.identifier,
             "sp_name": "sipin",
         })
     
@@ -90,7 +61,8 @@ def generate_mets_from_sip(sip: SIP, pid: str) -> str:
         "pid": pid,
         "files": files,
         "dmd_sections": dmd_secs,
-        "ie": sip,
+        "ie": sip.entity,
+        "events": sip.events,
         "archive_location": archive_location,
     }
     
