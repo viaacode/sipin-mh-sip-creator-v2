@@ -114,7 +114,7 @@ class EventListener:
             return
         self.log.info(f"Start handling of {subject}.")
         
-        sip = SIP.deserialize(event.get_data()["data"])
+        sip = SIP.deserialize(event.get_data())
         
         archive_location = self.determine_archive_location(sip)
         
@@ -123,7 +123,7 @@ class EventListener:
         files_path = Path(self.config["aip_folder"], pid)
         files_path.mkdir(parents=True, exist_ok=True)
 
-        for representation_index, representation in enumerate(sip.is_represented_by):
+        for representation_index, representation in enumerate(sip.entity.is_represented_by):
             if isinstance(representation, DigitalRepresentation):
                 shutil.copytree(
                     Path(subject, f"representations/representation_{representation_index+1}/data"),

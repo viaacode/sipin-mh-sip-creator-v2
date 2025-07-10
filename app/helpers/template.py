@@ -40,7 +40,7 @@ def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str) -> str:
                         "representation_index": representation_index,
                         "file_index": file_index,
                         "original_name": file.original_name,
-                        "checksum": file.fixity.value,
+                        "checksum": file.fixity,
                         "archive_location": archive_location,
                     })
         
