@@ -161,7 +161,7 @@ class EventListener:
             "paths": [
                 str(Path(f"{files_path}.zip")),
             ],
-            "cp_id": sip.maintainer.identifier,
+            "cp_id": sip.entity.maintainer.identifier,
             "type": "complex",
             "sip_profile": "basic",
             "pid": pid,
