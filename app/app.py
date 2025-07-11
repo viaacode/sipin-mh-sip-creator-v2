@@ -119,7 +119,7 @@ class EventListener:
                                "metadata_format": event_data["metadata_format"],
                                "mets_agents": event_data["mets_agents"], 
                                "premis_agents": event_data["premis_agents"], 
-                               "profile": event_data["sip_profile"]})
+                               "profile": event_data["profile"]})
         
         archive_location = self.determine_archive_location(sip)
         
