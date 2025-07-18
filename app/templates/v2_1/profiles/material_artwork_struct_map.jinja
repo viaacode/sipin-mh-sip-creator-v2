@@ -1,0 +1,16 @@
+<mets:structMap>
+  <mets:div TYPE="MaterialArtwork" DMDID="DMDID-MATERIAL-ARTWORK">
+    <mets:div TYPE="Media" DMDID="DMDID-MATERIAL-ARTWORK-METS">
+      <mets:div TYPE="Representation" LABEL="Original">
+        <mets:fptr FILEID="FILEID-METS" />
+      </mets:div>
+    </mets:div>
+    {% for file in files %}
+    <mets:div TYPE="Media" DMDID="{{ file.id.replace('FILEID', 'DMDID') }}">
+      <mets:div TYPE="Representation" LABEL="Original">
+        <mets:fptr FILEID="{{ file.id }}" />
+      </mets:div>
+    </mets:div>
+    {% endfor %}
+  </mets:div>
+</mets:structMap>

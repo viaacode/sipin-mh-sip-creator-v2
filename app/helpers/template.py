@@ -11,8 +11,10 @@ from sippy.objects import (
 from sippy.sip import SIP
 
 
-def get_jinja_template():
-    template_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "templates")
+def get_jinja_template(version: str):
+    version_folder = f"v{version.replace(".", "_")}"
+    
+    template_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "templates", version_folder)
     env = Environment(loader=FileSystemLoader(template_dir))
     
     return env.get_template("base.jinja")
@@ -22,11 +24,11 @@ def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str) -> str:
     """
     Generate a METS XML file from a SIP instance.
     """
-    template = get_jinja_template()
     
     profile = str(sip.profile).split("/")[-1]
     version = str(sip.profile).split("/")[-2]
     
+    template = get_jinja_template(version)
         
     files = []
     for representation_index, representation in enumerate(sip.entity.is_represented_by):

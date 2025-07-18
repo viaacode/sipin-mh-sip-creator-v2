@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:premis="http://www.loc.gov/premis/v3"
+  xmlns:revtmd="http://nwtssite.nwts.nara/schema/" xmlns:viaa="http://viaa.be"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd
+                      http://nwtssite.nwts.nara/schema/ http://www.archives.gov/preservation/products/reVTMD.xsd
+                      info:lc/xmlns/premis-v2 http://www.loc.gov/standards/premis/premis.xsd">
+  
+    <mets:metsHdr CREATEDATE="2025-07-07T15:38:21.693783">
+    <mets:agent ROLE="CUSTODIAN" TYPE="ORGANIZATION">
+      <mets:name>meemoo</mets:name>
+    </mets:agent>
+  </mets:metsHdr>
+  <mets:dmdSec ID="DMDID-FILM" CREATED="2023-11-20T21:44:28" STATUS="original">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/22.1/mhs/"
+        xmlns:mh="https://zeticon.mediahaven.com/metadata/22.1/mh/" version="22.1">
+        <mhs:Administrative>
+          <mh:ExternalId>dummy_pid</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:Title>Katten in de tuin</mh:Title>
+        </mhs:Descriptive>
+        <mhs:Dynamic>
+          <dc_title>Katten in de tuin</dc_title>
+          <dcterms_created>XXXX-XX-XX</dcterms_created>
+          <dc_rights_licenses>
+            <multiselect>BEZOEKERTOOL-CONTENT</multiselect>
+            <multiselect>BEZOEKERTOOL-METADATA-ALL</multiselect>
+            <multiselect>VIAA-INTRA_CP-CONTENT</multiselect>
+            <multiselect>VIAA-INTRA_CP-METADATA-ALL</multiselect>
+            <multiselect>VIAA-ONDERWIJS</multiselect>
+            <multiselect>VIAA-ONDERZOEK</multiselect>
+            <multiselect>VIAA-PUBLIEK-METADATA-LTD</multiselect>
+          </dc_rights_licenses>
+          <PID>dummy_pid</PID>
+          <CP_id>OR-jw86m54</CP_id>
+          <sp_name>sipin</sp_name>
+        </mhs:Dynamic>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+<mets:dmdSec ID="DMDID-FILM-METS" CREATED="2023-11-20T21:44:28" STATUS="original">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/22.1/mhs/"
+        xmlns:mh="https://zeticon.mediahaven.com/metadata/22.1/mh/" version="22.1">
+        <mhs:Administrative>
+          <mh:ExternalId>dummy_pid_mets</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:Title>dummy_pid_mets</mh:Title>
+        </mhs:Descriptive>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+
+<mets:dmdSec ID="DMDID-FILM-REPRESENTATION-0-0">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mh="https://zeticon.mediahaven.com/metadata/20.3/mh/"
+        xmlns:mhs="https://zeticon.mediahaven.com/metadata/20.3/mhs/" version="20.3"
+        xsi:schemaLocation="https://zeticon.mediahaven.com/metadata/20.3/mhs/ https://zeticon.mediahaven.com/metadata/20.3/mhs.xsd https://zeticon.mediahaven.com/metadata/20.3/mh/ https://zeticon.mediahaven.com/metadata/20.3/mh.xsd">
+        <mhs:Administrative>
+          <mh:ExternalId>dummy_pid_0_0</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:OriginalFilename>master_dummy.mkv</mh:OriginalFilename>
+        </mhs:Descriptive>
+        <mhs:Dynamic>
+          <PID>dummy_pid</PID>
+          <CP_id>OR-jw86m54</CP_id>
+          <sp_name>sipin</sp_name>
+        </mhs:Dynamic>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+
+<mets:dmdSec ID="DMDID-FILM-REPRESENTATION-1-0">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mh="https://zeticon.mediahaven.com/metadata/20.3/mh/"
+        xmlns:mhs="https://zeticon.mediahaven.com/metadata/20.3/mhs/" version="20.3"
+        xsi:schemaLocation="https://zeticon.mediahaven.com/metadata/20.3/mhs/ https://zeticon.mediahaven.com/metadata/20.3/mhs.xsd https://zeticon.mediahaven.com/metadata/20.3/mh/ https://zeticon.mediahaven.com/metadata/20.3/mh.xsd">
+        <mhs:Administrative>
+          <mh:ExternalId>dummy_pid_1_0</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:OriginalFilename>mezzanine_dummy.mov</mh:OriginalFilename>
+        </mhs:Descriptive>
+        <mhs:Dynamic>
+          <PID>dummy_pid</PID>
+          <CP_id>OR-jw86m54</CP_id>
+          <sp_name>sipin</sp_name>
+        </mhs:Dynamic>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+
+<mets:dmdSec ID="DMDID-FILM-REPRESENTATION-2-0">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mh="https://zeticon.mediahaven.com/metadata/20.3/mh/"
+        xmlns:mhs="https://zeticon.mediahaven.com/metadata/20.3/mhs/" version="20.3"
+        xsi:schemaLocation="https://zeticon.mediahaven.com/metadata/20.3/mhs/ https://zeticon.mediahaven.com/metadata/20.3/mhs.xsd https://zeticon.mediahaven.com/metadata/20.3/mh/ https://zeticon.mediahaven.com/metadata/20.3/mh.xsd">
+        <mhs:Administrative>
+          <mh:ExternalId>dummy_pid_2_0</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:OriginalFilename>dummy.pdf</mh:OriginalFilename>
+        </mhs:Descriptive>
+        <mhs:Dynamic>
+          <PID>dummy_pid</PID>
+          <CP_id>OR-jw86m54</CP_id>
+          <sp_name>sipin</sp_name>
+        </mhs:Dynamic>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+
+<mets:dmdSec ID="DMDID-FILM-REPRESENTATION-3-0">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mh="https://zeticon.mediahaven.com/metadata/20.3/mh/"
+        xmlns:mhs="https://zeticon.mediahaven.com/metadata/20.3/mhs/" version="20.3"
+        xsi:schemaLocation="https://zeticon.mediahaven.com/metadata/20.3/mhs/ https://zeticon.mediahaven.com/metadata/20.3/mhs.xsd https://zeticon.mediahaven.com/metadata/20.3/mh/ https://zeticon.mediahaven.com/metadata/20.3/mh.xsd">
+        <mhs:Administrative>
+          <mh:ExternalId>dummy_pid_3_0</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:OriginalFilename>dummy.jpg</mh:OriginalFilename>
+        </mhs:Descriptive>
+        <mhs:Dynamic>
+          <PID>dummy_pid</PID>
+          <CP_id>OR-jw86m54</CP_id>
+          <sp_name>sipin</sp_name>
+        </mhs:Dynamic>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+
+  
+  <mets:fileSec>
+    <mets:fileGrp USE="Original">
+        
+        <mets:file ID="FILEID-FILM-REPRESENTATION-0-0" CHECKSUM="a427d6f9dcf9d4db5145dc159fef7727" CHECKSUMTYPE="MD5" USE="disk">
+            <mets:FLocat xlink:href="representation_1/master_dummy.mkv" LOCTYPE="URL" />
+        </mets:file>
+        
+        <mets:file ID="FILEID-FILM-REPRESENTATION-1-0" CHECKSUM="04c2f9a43c2aa4d6f6975903bad69a67" CHECKSUMTYPE="MD5" USE="disk">
+            <mets:FLocat xlink:href="representation_2/mezzanine_dummy.mov" LOCTYPE="URL" />
+        </mets:file>
+        
+        <mets:file ID="FILEID-FILM-REPRESENTATION-2-0" CHECKSUM="b0dfa6f04e6056ecd953a2ad127820e3" CHECKSUMTYPE="MD5" USE="disk">
+            <mets:FLocat xlink:href="representation_3/dummy.pdf" LOCTYPE="URL" />
+        </mets:file>
+        
+        <mets:file ID="FILEID-FILM-REPRESENTATION-3-0" CHECKSUM="b14d633a01600edabc450a0d0ae4390d" CHECKSUMTYPE="MD5" USE="disk">
+            <mets:FLocat xlink:href="representation_4/dummy.jpg" LOCTYPE="URL" />
+        </mets:file>
+        
+        <mets:file ID="FILEID-FILM-METS" USE="Disk">
+            <mets:FLocat xlink:href="mets.xml" LOCTYPE="URL" />
+        </mets:file>
+    </mets:fileGrp>
+</mets:fileSec>
+  <mets:structMap>
+  <mets:div TYPE="Basic" DMDID="DMDID-FILM">
+    <mets:div TYPE="Media" DMDID="DMDID-FILM-METS">
+      <mets:div TYPE="Representation" LABEL="Original">
+        <mets:fptr FILEID="FILEID-FILM-METS" />
+      </mets:div>
+    </mets:div>
+    
+    <mets:div TYPE="Media" DMDID="DMDID-FILM-REPRESENTATION-0-0">
+      <mets:div TYPE="Representation" LABEL="Original">
+        <mets:fptr FILEID="FILEID-FILM-REPRESENTATION-0-0" />
+      </mets:div>
+    </mets:div>
+    
+    <mets:div TYPE="Media" DMDID="DMDID-FILM-REPRESENTATION-1-0">
+      <mets:div TYPE="Representation" LABEL="Original">
+        <mets:fptr FILEID="FILEID-FILM-REPRESENTATION-1-0" />
+      </mets:div>
+    </mets:div>
+    
+    <mets:div TYPE="Media" DMDID="DMDID-FILM-REPRESENTATION-2-0">
+      <mets:div TYPE="Representation" LABEL="Original">
+        <mets:fptr FILEID="FILEID-FILM-REPRESENTATION-2-0" />
+      </mets:div>
+    </mets:div>
+    
+    <mets:div TYPE="Media" DMDID="DMDID-FILM-REPRESENTATION-3-0">
+      <mets:div TYPE="Representation" LABEL="Original">
+        <mets:fptr FILEID="FILEID-FILM-REPRESENTATION-3-0" />
+      </mets:div>
+    </mets:div>
+    
+  </mets:div>
+</mets:structMap>
+</mets:mets>

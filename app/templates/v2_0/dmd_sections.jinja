@@ -13,13 +13,9 @@
           <dc_title>{{ ie.name.nl }}</dc_title>
           <dcterms_created>{{ ie.date_created.value }}</dcterms_created>
           <dc_rights_licenses>
-            <multiselect>BEZOEKERTOOL-CONTENT</multiselect>
-            <multiselect>BEZOEKERTOOL-METADATA-ALL</multiselect>
-            <multiselect>VIAA-INTRA_CP-CONTENT</multiselect>
-            <multiselect>VIAA-INTRA_CP-METADATA-ALL</multiselect>
-            <multiselect>VIAA-ONDERWIJS</multiselect>
-            <multiselect>VIAA-ONDERZOEK</multiselect>
-            <multiselect>VIAA-PUBLIEK-METADATA-LTD</multiselect>
+            {% for license in ie.license %}
+            <multiselect>{{ license.pref_label.nl }}</multiselect>
+            {% endfor %}
           </dc_rights_licenses>
           <PID>{{ pid }}</PID>
           <CP_id>{{ie.maintainer.identifier}}</CP_id>
