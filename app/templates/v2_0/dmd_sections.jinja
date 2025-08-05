@@ -1,8 +1,8 @@
 <mets:dmdSec ID="DMDID-{{ profile.upper()}}" CREATED="2023-11-20T21:44:28" STATUS="original">
   <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
     <mets:xmlData>
-      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/22.1/mhs/"
-        xmlns:mh="https://zeticon.mediahaven.com/metadata/22.1/mh/" version="22.1">
+      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mhs/"
+        xmlns:mh="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mh/" version="{{ mh_sidecar_version }}">
         <mhs:Administrative>
           <mh:ExternalId>{{ pid }}</mh:ExternalId>
         </mhs:Administrative>
@@ -28,8 +28,8 @@
 <mets:dmdSec ID="DMDID-{{ profile.upper()}}-METS" CREATED="2023-11-20T21:44:28" STATUS="original">
   <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
     <mets:xmlData>
-      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/22.1/mhs/"
-        xmlns:mh="https://zeticon.mediahaven.com/metadata/22.1/mh/" version="22.1">
+      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mhs/"
+        xmlns:mh="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mh/" version="{{ mh_sidecar_version }}">
         <mhs:Administrative>
           <mh:ExternalId>{{ pid }}_mets</mh:ExternalId>
         </mhs:Administrative>

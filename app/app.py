@@ -121,9 +121,13 @@ class EventListener:
                                "premis_agents": event_data["premis_agents"], 
                                "profile": event_data["profile"]})
         
-        archive_location = self.determine_archive_location(sip)
         
+        archive_location = self.determine_archive_location(sip)
+        mh_sidecar_version = self.config["mh_sidecar_version"]
         pid = self.pid_client.get_pid()
+        
+        mets_xml = generate_mets_from_sip(sip, pid, archive_location, mh_sidecar_version)
+        
 
         files_path = Path(self.config["aip_folder"], pid)
         files_path.mkdir(parents=True, exist_ok=True)
@@ -135,8 +139,8 @@ class EventListener:
                     Path(files_path, f"representation_{representation_index+1}"),
                     copy_function=shutil.move,
                 )
-
-        mets_xml = generate_mets_from_sip(sip, pid, archive_location)
+                
+        
 
         try:
             # Save the generated XML to a file

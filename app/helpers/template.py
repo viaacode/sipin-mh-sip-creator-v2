@@ -10,6 +10,7 @@ from sippy.objects import (
 
 from sippy.sip import SIP
 
+from .mapping import generate_mh_sidecar_dict
 
 def get_jinja_template(version: str):
     version_folder = f"v{version.replace(".", "_")}"
@@ -20,7 +21,7 @@ def get_jinja_template(version: str):
     return env.get_template("base.jinja")
 
 
-def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str) -> str:
+def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str, mh_sidecar_version: str) -> str:
     """
     Generate a METS XML file from a SIP instance.
     """
@@ -45,6 +46,9 @@ def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str) -> str:
                         "checksum": file.fixity.value,
                         "archive_location": archive_location,
                     })
+                    
+    sidecar = generate_mh_sidecar_dict(sip)      
+    
         
     dmd_secs = []
     for file in files:
@@ -58,6 +62,7 @@ def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str) -> str:
         })
     
     data = {
+        "mh_sidecar_version": mh_sidecar_version,
         "createdate": datetime.now().isoformat(),
         "profile": profile,
         "pid": pid,
@@ -66,6 +71,7 @@ def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str) -> str:
         "ie": sip.entity,
         "events": sip.events,
         "archive_location": archive_location,
+        "sidecar": sidecar,
     }
     
     return template.render(data)

@@ -5,14 +5,14 @@
       <mets:xmlData>
         <premis:event>
           <premis:eventType>{{ event.type }}</premis:eventType>
-          <premis:eventDateTime>{{ event.started_at_time }}</premis:eventDateTime>          
-          <premis:linkingAgentIdentifier>
+          <premis:eventDateTime>{{ event.started_at_time.value }}</premis:eventDateTime>          
+          {# <premis:linkingAgentIdentifier>
             <premis:linkingAgentIdentifierType>{{ agent.type }}</premis:linkingAgentIdentifierType>
             <premis:linkingAgentIdentifierValue>{{ agent.value }}</premis:linkingAgentIdentifierValue>
             {% if agent.role %}
             <premis:linkingAgentRole>{{ agent.role }}</premis:linkingAgentRole>
             {% endif %}
-          </premis:linkingAgentIdentifier>
+          </premis:linkingAgentIdentifier> #}
         </premis:event>
       </mets:xmlData>
     </mets:mdWrap>

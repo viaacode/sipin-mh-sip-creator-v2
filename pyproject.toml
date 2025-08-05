@@ -8,7 +8,7 @@ dependencies = [
     "viaa-chassis",
     "pulsar-client",
     "meemoo-cloudevents",
-    "SIP.py==0.0.4",
+    "SIP.py==0.0.5",
     "requests",
     "jinja2",
 ]
