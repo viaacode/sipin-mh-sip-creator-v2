@@ -120,7 +120,12 @@ class EventListener:
         
         archive_location = self.determine_archive_location(sip)
         mh_sidecar_version = self.config["mh_sidecar_version"]
-        pid = self.pid_client.get_pid()
+        
+        # reuse pid if provided, otherwise generate a new one
+        if len(sip.entity.identifier) == 10:
+            pid = sip.entity.identifier
+        else:
+            pid = self.pid_client.get_pid()
         
         mets_xml = generate_mets_from_sip(sip, pid, archive_location, mh_sidecar_version)
         
