@@ -38,11 +38,16 @@ def generate_mets_from_sip(sip: SIP, pid: str, archive_location: str, mh_sidecar
                 if isinstance(file, File):
                     # we need to make a MH media with a MH representation entry that corresponds to a dmd sec and filegroup
                     # for the filesice we need the checksum and we generate a ID based.
+                    path = file.stored_at.file_path.split("representations/")[1].replace("/data", "")
+                    representation_folder = path.split("/")[0].split("_")[1]
+                    filename = path.split("/")[1]
+                    
+                    
                     files.append({
-                        "id": f"FILEID-{profile.upper()}-REPRESENTATION-{representation_index}-{file_index}",
-                        "representation_index": representation_index,
+                        "id": f"FILEID-{profile.upper()}-REPRESENTATION-{representation_folder}-{file_index}",
+                        "representation_index": representation_folder,
                         "file_index": file_index,
-                        "original_name": file.original_name,
+                        "original_name": filename,
                         "checksum": file.fixity.value,
                         "archive_location": archive_location,
                     })
