@@ -163,7 +163,7 @@ class EventListener:
             ],
             "cp_id": sip.entity.maintainer.identifier,
             "type": "complex",
-            "sip_profile": "basic",
+            "sip_profile": str(sip.profile).split("/")[-1],
             "pid": pid,
             "outcome": EventOutcome.SUCCESS,
             "metadata": mets_xml,
