@@ -115,6 +115,7 @@ class EventListener:
         self.log.info(f"Start handling of {subject}.")
         
         event_data = event.get_data()
+        event_data.pop("is_valid")
         sip = SIP.deserialize(event_data)
         
         archive_location = self.determine_archive_location(sip)
