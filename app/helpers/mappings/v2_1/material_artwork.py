@@ -15,8 +15,8 @@ def get_mh_mapping(sip: SIP) -> dict:
 
     mapping = {
         "Descriptive": {
-            "Title": get_nl_string(ie.name.root),
-            "Description": get_nl_string(ie.description.root)
+            "mh:Title": get_nl_string(ie.name.root),
+            "mh:Description": get_nl_string(ie.description.root)
             if ie.description
             else None,
         },
