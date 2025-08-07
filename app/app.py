@@ -115,12 +115,7 @@ class EventListener:
         self.log.info(f"Start handling of {subject}.")
         
         event_data = event.get_data()
-        sip = SIP.deserialize({"metadata": event_data["metadata"],
-                               "metadata_format": event_data["metadata_format"],
-                               "mets_agents": event_data["mets_agents"], 
-                               "premis_agents": event_data["premis_agents"], 
-                               "profile": event_data["profile"]})
-        
+        sip = SIP.deserialize(event_data)
         
         archive_location = self.determine_archive_location(sip)
         mh_sidecar_version = self.config["mh_sidecar_version"]
