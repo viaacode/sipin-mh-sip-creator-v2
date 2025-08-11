@@ -26,9 +26,11 @@ dev = [
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--rootdir=./app/ -v"
-testpaths = ["tests"]
+addopts = "-v --ignore=transformator"
 
 [[tool.mypy.overrides]]
 module = ["untyped_package.*"]
 follow_untyped_imports = true
+
+[tool.setuptools]
+packages = ["app"]

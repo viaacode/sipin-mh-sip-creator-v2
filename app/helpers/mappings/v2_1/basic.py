@@ -13,8 +13,6 @@ from sippy import LangString
 def get_mh_mapping(
     sip: SIP,
 ) -> dict[str, dict[str, str | list[tuple[str, str]] | None]]:
-    ie = sip.entity
-
     mapping = {
         "Descriptive": {
             "Title": get_nl_strings(sip.entity.name.root),
