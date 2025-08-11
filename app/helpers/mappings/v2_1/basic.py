@@ -10,10 +10,11 @@ from sippy import LangString
 # TODO: rechtenverklaring & hergebruiksvoorwaarden
 
 
-def get_mh_mapping(sip: SIP) -> dict[str, str | list[tuple[str, str]]]:
-    """
-    Generate a mapping for the Material Artwork profile.
-    """
+def get_mh_mapping(
+    sip: SIP,
+) -> dict[str, dict[str, str | list[tuple[str, str]] | None]]:
+    ie = sip.entity
+
     mapping = {
         "Descriptive": {
             "Title": get_nl_strings(sip.entity.name.root),
