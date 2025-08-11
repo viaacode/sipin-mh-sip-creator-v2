@@ -1,7 +1,5 @@
-import pytest
 from sippy.sip import SIP
 from app.helpers.template import generate_mets_from_sip
-import xml.etree.ElementTree as ET
 
 
 test_event = {

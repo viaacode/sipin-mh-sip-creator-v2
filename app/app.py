@@ -11,9 +11,7 @@ from pathlib import Path
 
 from app.helpers.template import generate_mets_from_sip
 
-from sippy.objects import (
-    DigitalRepresentation
-)
+from sippy.objects import DigitalRepresentation
 
 from sippy.sip import SIP
 
@@ -36,14 +34,14 @@ class EventListener:
         self.log = logging.get_logger(__name__, config=config_parser)
         self.pulsar_client = PulsarClient()
         self.pid_client = PidClient()
-        
+
     def determine_archive_location(self, sip: SIP) -> str:
         """
         Determines the archive location for the SIP based on its maintainer.
-        
+
         Args:
             sip (SIP): The SIP object containing metadata.
-        
+
         Returns:
             str: The archive location path.
         """
@@ -63,10 +61,9 @@ class EventListener:
             archive_location = "Tape"
         if cp_id.lower() in disk_content_partners:
             archive_location = "Disk"
-            
+
         return archive_location
 
-        
     def produce_event(
         self,
         topic: str,
@@ -106,42 +103,46 @@ class EventListener:
             return
 
         event_attributes = event.get_attributes()
-        
+
         # Subject contains the path to the unzipped bag
         subject = event_attributes.get("subject")
         if subject is None:
             self.log.error("Invalid event: subject is missing.")
             return
         self.log.info(f"Start handling of {subject}.")
-        
+
         event_data = event.get_data()
         event_data.pop("is_valid")
         sip = SIP.deserialize(event_data)
-        
+
         archive_location = self.determine_archive_location(sip)
         mh_sidecar_version = self.config["mh_sidecar_version"]
-        
+
         # reuse pid if provided, otherwise generate a new one
         if len(sip.entity.identifier) == 10:
             pid = sip.entity.identifier
         else:
             pid = self.pid_client.get_pid()
-        
-        mets_xml = generate_mets_from_sip(sip, pid, archive_location, mh_sidecar_version)
-        
+
+        mets_xml = generate_mets_from_sip(
+            sip, pid, archive_location, mh_sidecar_version
+        )
 
         files_path = Path(self.config["aip_folder"], pid)
         files_path.mkdir(parents=True, exist_ok=True)
 
-        for representation_index, representation in enumerate(sip.entity.is_represented_by):
+        for representation_index, representation in enumerate(
+            sip.entity.is_represented_by
+        ):
             if isinstance(representation, DigitalRepresentation):
                 shutil.copytree(
-                    Path(subject, f"representations/representation_{representation_index+1}/data"),
-                    Path(files_path, f"representation_{representation_index+1}"),
+                    Path(
+                        subject,
+                        f"representations/representation_{representation_index + 1}/data",
+                    ),
+                    Path(files_path, f"representation_{representation_index + 1}"),
                     copy_function=shutil.move,
                 )
-                
-        
 
         try:
             # Save the generated XML to a file
@@ -152,13 +153,13 @@ class EventListener:
             self.log.info(f"Generated METS XML file at {mets_file_path}")
         except Exception as e:
             self.log.error(f"Failed to generate METS XML: {e}")
-            
+
         with zipfile.ZipFile(str(Path(f"{files_path}.zip")), "w") as zf:
             for file_path in files_path.rglob("*"):
                 zf.write(file_path, arcname=file_path.relative_to(files_path))
         # Remove files folder
         shutil.rmtree(files_path)
-            
+
         # Send event on topic
         data = {
             "source": str(files_path),
@@ -172,7 +173,7 @@ class EventListener:
             "pid": pid,
             "outcome": EventOutcome.SUCCESS,
             "metadata": mets_xml,
-            "message": f"AIP created: MH2.0 complex created for {event_attributes.get("subject")}",
+            "message": f"AIP created: MH2.0 complex created for {event_attributes.get('subject')}",
         }
         producer_topic = self.config["pulsar"]["producer_topic"]
 

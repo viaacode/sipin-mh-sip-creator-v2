@@ -10,12 +10,14 @@ mets_agents = '[{"id": null, "name": "meemoo SIP creator", "note": {"note_type":
 
 profile = '"https://data.hetarchief.be/id/sip/2.1/film"'
 
-deserialized = SIP.deserialize({
-    "metadata_format": metadata_format,
-    "metadata": metadata,
-    "premis_agents": premis_agents,
-    "mets_agents": mets_agents,
-    "profile": profile,
-})
+deserialized = SIP.deserialize(
+    {
+        "metadata_format": metadata_format,
+        "metadata": metadata,
+        "premis_agents": premis_agents,
+        "mets_agents": mets_agents,
+        "profile": profile,
+    }
+)
 
 print(generate_mets_from_sip(deserialized, "dummy_pid", "disk"))
