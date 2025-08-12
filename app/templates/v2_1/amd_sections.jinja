@@ -1,18 +1,26 @@
 <mets:amdSec ID="EVENTS">
   {% for event in events %}
-  <mets:digiprovMD>
+  <mets:digiprovMD id="PREMIS-{{ event.type.split('/')[-1].upper() }}">
     <mets:mdWrap MDTYPE="PREMIS:EVENT">
       <mets:xmlData>
         <premis:event>
-          <premis:eventType>{{ event.type }}</premis:eventType>
-          <premis:eventDateTime>{{ event.started_at_time.value }}</premis:eventDateTime>          
-          {# <premis:linkingAgentIdentifier>
-            <premis:linkingAgentIdentifierType>{{ agent.type }}</premis:linkingAgentIdentifierType>
-            <premis:linkingAgentIdentifierValue>{{ agent.value }}</premis:linkingAgentIdentifierValue>
-            {% if agent.role %}
-            <premis:linkingAgentRole>{{ agent.role }}</premis:linkingAgentRole>
+          <premis:eventType>{{ event.type.split("/")[-1] }}</premis:eventType>
+          <premis:eventDateTime>{{ event.started_at_time.value }}</premis:eventDateTime>    
+          <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>{{ event.id }}</premis:eventIdentifierValue>
+          </premis:eventIdentifier>
+          <premis:eventDetailInformation>
+            <premis:eventDetail>{{ event.note }}</premis:eventDetail>
+          </premis:eventDetailInformation>
+          <premis:eventOutcomeInformation>
+            <premis:eventOutcome>{{event.outcome.id }}</premis:eventOutcome>
+            {% if event.outcome_note %}
+            <premis:eventOutcomeDetail>
+              <premis:eventOutcomeDetailNote>{{ event.outcome_note }}</premis:eventOutcomeDetailNote>
+            </premis:eventOutcomeDetail>
             {% endif %}
-          </premis:linkingAgentIdentifier> #}
+          </premis:eventOutcomeInformation>
         </premis:event>
       </mets:xmlData>
     </mets:mdWrap>
