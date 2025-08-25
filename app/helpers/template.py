@@ -1,16 +1,18 @@
 import os
 from datetime import datetime
+from pathlib import Path
+from typing import Literal
 
 from jinja2 import Environment, FileSystemLoader
 
 from sippy.objects import (
     DigitalRepresentation,
-    File,
 )
 
 from sippy.sip import SIP
 
 from .mapping import generate_mh_sidecar_dict
+from .utils import MediaHavenCreatorError
 
 
 def get_jinja_template(version: str):
@@ -27,7 +29,10 @@ def get_jinja_template(version: str):
 
 
 def generate_mets_from_sip(
-    sip: SIP, pid: str, archive_location: str, mh_sidecar_version: str
+    sip: SIP,
+    pid: str,
+    archive_location: Literal["Disk", "Tape"],
+    mh_sidecar_version: str,
 ) -> str:
     """
     Generate a METS XML file from a SIP instance.
@@ -39,28 +44,35 @@ def generate_mets_from_sip(
     template = get_jinja_template(version)
 
     files = []
-    for representation_index, representation in enumerate(sip.entity.is_represented_by):
-        if isinstance(representation, DigitalRepresentation):
-            for file_index, file in enumerate(representation.includes):
-                if isinstance(file, File):
-                    # we need to make a MH media with a MH representation entry that corresponds to a dmd sec and filegroup
-                    # for the filesice we need the checksum and we generate a ID based.
-                    path = file.stored_at.file_path.split("representations/")[
-                        1
-                    ].replace("/data", "")
-                    representation_folder = path.split("/")[0].split("_")[1]
-                    filename = path.split("/")[1]
 
-                    files.append(
-                        {
-                            "id": f"FILEID-{profile.upper()}-REPRESENTATION-{representation_folder}-{file_index}",
-                            "representation_index": representation_folder,
-                            "file_index": file_index,
-                            "original_name": filename,
-                            "checksum": file.fixity.value,
-                            "archive_location": archive_location,
-                        }
-                    )
+    digital_representations = [
+        r for r in sip.entity.is_represented_by if isinstance(r, DigitalRepresentation)
+    ]
+    for representation_index, representation in enumerate(digital_representations):
+        for file_index, file in enumerate(representation.includes):
+            if file.stored_at.file_path is None:
+                raise MediaHavenCreatorError(
+                    "The file path on SIP.py File must be present in order to create a MediaHaven SIP."
+                )
+
+            file_path = Path(file.stored_at.file_path)
+            file_name = file_path.name
+
+            if file.fixity is None:
+                raise MediaHavenCreatorError(
+                    "The fixity on SIP.py File must be present in order to create a MediaHaven SIP."
+                )
+
+            files.append(
+                {
+                    "id": f"FILEID-{profile.upper()}-REPRESENTATION-{representation_index}-{file_index}",
+                    "representation_index": representation_index,
+                    "file_index": file_index,
+                    "original_name": file_name,
+                    "checksum": file.fixity.value,
+                    "archive_location": archive_location,
+                }
+            )
 
     sidecar = generate_mh_sidecar_dict(sip)
 

@@ -1,13 +1,15 @@
+import shutil
+import zipfile
+from pathlib import Path
+from typing import Literal
+
 from cloudevents.events import Event, PulsarBinding, EventOutcome, EventAttributes
 from viaa.configuration import ConfigParser
 from viaa.observability import logging
 
 from app.services.pulsar import PulsarClient
 from app.services.pid import PidClient
-
-import shutil
-import zipfile
-from pathlib import Path
+from app.helpers.utils import MediaHavenCreatorError
 
 from app.helpers.template import generate_mets_from_sip
 
@@ -35,7 +37,7 @@ class EventListener:
         self.pulsar_client = PulsarClient()
         self.pid_client = PidClient()
 
-    def determine_archive_location(self, sip: SIP) -> str:
+    def determine_archive_location(self, sip: SIP) -> Literal["Disk", "Tape"]:
         """
         Determines the archive location for the SIP based on its maintainer.
 
@@ -59,8 +61,12 @@ class EventListener:
 
         if cp_id.lower() in tape_content_partners:
             archive_location = "Tape"
-        if cp_id.lower() in disk_content_partners:
+        elif cp_id.lower() in disk_content_partners:
             archive_location = "Disk"
+        else:
+            raise MediaHavenCreatorError(
+                f"Could not determine archive location for '{cp_id}'"
+            )
 
         return archive_location
 
@@ -82,7 +88,7 @@ class EventListener:
         """
         attributes = EventAttributes(
             type=topic,
-            source=APP_NAME,
+            source=APP_NAME,  # TODO: set file path for delete service
             subject=subject,
             correlation_id=correlation_id,
             outcome=outcome,
