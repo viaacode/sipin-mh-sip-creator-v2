@@ -1,30 +1,39 @@
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, PackageLoader
 
-from sippy.objects import (
-    DigitalRepresentation,
-)
+import sippy
 
 from sippy.sip import SIP
 
-from .mapping import generate_mh_sidecar_dict
-from .utils import MediaHavenCreatorError
+from . import profiles
 
 
-def get_jinja_template(version: str):
-    version_folder = f"v{version.replace('.', '_')}"
+def generate_mh_sidecar_dict(sip: sippy.SIP):  # TODO: return type
+    splitted = sip.profile.split("/")
+    profile = splitted[-1]
+    version = splitted[-2]
 
-    template_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "templates",
-        version_folder,
-    )
-    env = Environment(loader=FileSystemLoader(template_dir))
+    match profile:
+        case "material-artwork":
+            profile_module = profiles.material_artwork
+        case "film":
+            profile_module = profiles.film
+        case "basic":
+            profile_module = profiles.basic
+        case _:
+            raise ValueError(f"Unsupported profile '{profile}' for version '{version}'")
 
+    return profile_module.get_mh_mapping(sip)
+
+
+def get_jinja_template():
+    """
+    Gets the `templates/base.jinja` within the current package.
+    """
+    env = Environment(loader=PackageLoader(__name__))
     return env.get_template("base.jinja")
 
 
@@ -39,19 +48,19 @@ def generate_mets_from_sip(
     """
 
     profile = str(sip.profile).split("/")[-1]
-    version = str(sip.profile).split("/")[-2]
-
-    template = get_jinja_template(version)
+    template = get_jinja_template()
 
     files = []
 
     digital_representations = [
-        r for r in sip.entity.is_represented_by if isinstance(r, DigitalRepresentation)
+        r
+        for r in sip.entity.is_represented_by
+        if isinstance(r, sippy.DigitalRepresentation)
     ]
     for representation_index, representation in enumerate(digital_representations):
         for file_index, file in enumerate(representation.includes):
             if file.stored_at.file_path is None:
-                raise MediaHavenCreatorError(
+                raise ValueError(
                     "The file path on SIP.py File must be present in order to create a MediaHaven SIP."
                 )
 
@@ -59,7 +68,7 @@ def generate_mets_from_sip(
             file_name = file_path.name
 
             if file.fixity is None:
-                raise MediaHavenCreatorError(
+                raise ValueError(
                     "The fixity on SIP.py File must be present in order to create a MediaHaven SIP."
                 )
 

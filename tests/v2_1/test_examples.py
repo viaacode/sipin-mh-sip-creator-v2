@@ -3,19 +3,21 @@ from pathlib import Path
 import pytest
 
 import sippy
-from app.helpers.template import generate_mets_from_sip
+from app.utils import get_sip_creator
 
 
-# Install the transformator and its dependencies.
-# The current setup is very ugly because the transformator is not a library.
-# Furthermore setuptools can't have dependecies defined by a relative path.
+"""
+Since the transformator is not a library and setuptools doesn't support relative paths to packages,
+you must install the transformator manually
+"""
 
-# pip install ./transformator --extra-index-url http://do-prd-mvn-01.do.viaa.be:8081/repository/pypi-all/simple --trusted-host do-prd-mvn-01.do.viaa.be --upgrade
 
 try:
     from transformator.v2_1 import transform_sip
 except ImportError:
-    raise ImportError("Install the transformator to run the tests.")
+    raise ImportError(
+        "Install the transformator to run the tests: pip install ./transformator --extra-index-url http://do-prd-mvn-01.do.viaa.be:8081/repository/pypi-all/simple --trusted-host do-prd-mvn-01.do.viaa.be --upgrade"
+    )
 
 
 sip_paths = set(Path("tests/sip-examples/2.1").iterdir())
@@ -38,4 +40,6 @@ unzipped_path_names = [str(path.parent.name) for path in unzipped_paths]
 def test_examples(sip_path: Path):
     data = transform_sip(sip_path)
     sip = sippy.SIP.deserialize(data)
-    generate_mets_from_sip(sip, "test_pid", "disk", "25.1")
+
+    creator_fn = get_sip_creator(sip)
+    creator_fn(sip, "test_pid", "Disk", "25.1")

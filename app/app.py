@@ -9,12 +9,9 @@ from viaa.observability import logging
 
 from app.services.pulsar import PulsarClient
 from app.services.pid import PidClient
-from app.helpers.utils import MediaHavenCreatorError
-
-from app.helpers.template import generate_mets_from_sip
+from app.utils import MediaHavenCreatorError, get_sip_creator
 
 from sippy.objects import DigitalRepresentation
-
 from sippy.sip import SIP
 
 
@@ -130,9 +127,8 @@ class EventListener:
         else:
             pid = self.pid_client.get_pid()
 
-        mets_xml = generate_mets_from_sip(
-            sip, pid, archive_location, mh_sidecar_version
-        )
+        creator_fn = get_sip_creator(sip)
+        mets_xml = creator_fn(sip, pid, archive_location, mh_sidecar_version)
 
         files_path = Path(self.config["aip_folder"], pid)
         files_path.mkdir(parents=True, exist_ok=True)
