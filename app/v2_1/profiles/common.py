@@ -1,5 +1,5 @@
 from typing import Any
-from urllib.parse import urlparse 
+from urllib.parse import urlparse
 from pathlib import Path
 
 import sippy
@@ -28,46 +28,18 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
                 ("Auteursrechthouder", get_nl_string(owner.name))
                 for owner in ie.copyright_holder
             ],
-            "dc_subjects": [
-                ("Trefwoord", trefwoord) for trefwoord in get_nl_strings(ie.keywords)
-            ]
-            if ie.keywords
-            else None,
-            "dc_identifier_localid": next((primary_id.value for primary_id in ie.primary_identifier), None),
-            "dc_identifier_localids": [
-                (get_local_id_type(local_id), local_id.value) for local_id in ie.local_identifier
-            ],
+            "dc_subjects": get_dc_subjects(ie),
+            "dc_identifier_localid": next(
+                (primary_id.value for primary_id in ie.primary_identifier), None
+            ),
+            "dc_identifier_localids": get_dc_identifier_localids(ie),
             "dc_languages": [("multiselect", lang) for lang in ie.in_language],
-            "dc_titles": [
-                ("title", title.id) for title in ie.is_part_of
-            ],  # TODO: what is this?
-            "dc_creators": [
-                (creator.role_name, get_nl_string(creator.creator.name))
-                for creator in ie.creator
-                if creator.creator
-            ],
-            "dc_contributors": [
-                (
-                    contributor.role_name,
-                    get_nl_string(contributor.contributor.name),
-                )
-                for contributor in ie.contributor
-                if contributor.contributor
-            ],
-            "dc_publishers": [
-                (publisher.role_name, get_nl_string(publisher.publisher.name))
-                for publisher in ie.publisher
-                if publisher.publisher
-            ],
-            "dc_types": [("multiselect", genre) for genre in get_nl_strings(ie.genre)]
-            if ie.genre
-            else None,
-            "dc_coverages": [
-                ("ruimte", get_nl_string(ruimte.name)) for ruimte in ie.spatial
-            ]
-            + [("tijd", tijd) for tijd in get_nl_strings(ie.temporal)]
-            if ie.temporal
-            else [],
+            "dc_titles": [("title", title.id) for title in ie.is_part_of],
+            "dc_creators": get_creators(ie),
+            "dc_contributors": get_contributors(ie),
+            "dc_publishers": get_publishers(ie),
+            "dc_types": get_dc_types(ie),
+            "dc_coverages": get_coverages(ie),
             "artmedium": get_optional_nl_string(ie.art_medium),
             "artform": get_optional_nl_string(ie.artform),
             "dc_rights_credit": get_optional_nl_string(ie.credit_text),
@@ -157,6 +129,76 @@ def deepmerge(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
+def get_dc_identifier_localids(entity: sippy.IntellectualEntity):
+    return [
+        (get_local_id_type(local_id), local_id.value)
+        for local_id in entity.local_identifier
+    ]
+
+
 def get_local_id_type(local_id: sippy.LocalIdentifier) -> str:
     local_id_url = local_id.type
     return Path(urlparse(local_id_url).path).name
+
+
+def get_creators(entity: sippy.IntellectualEntity) -> list[tuple[str, str]] | None:
+    creators = [
+        (creator.role_name, get_nl_string(creator.creator.name))
+        for creator in entity.creator
+        if creator.creator
+    ]
+    return creators if len(creators) > 0 else None
+
+
+def get_contributors(entity: sippy.IntellectualEntity) -> list[tuple[str, str]] | None:
+    contributors = [
+        (
+            contributor.role_name,
+            get_nl_string(contributor.contributor.name),
+        )
+        for contributor in entity.contributor
+        if contributor.contributor
+    ]
+
+    return contributors if len(contributors) > 0 else None
+
+
+def get_publishers(entity: sippy.IntellectualEntity) -> list[tuple[str, str]] | None:
+    publishers = [
+        (
+            publisher.role_name,
+            get_nl_string(publisher.publisher.name),
+        )
+        for publisher in entity.publisher
+        if publisher.publisher
+    ]
+
+    return publishers if len(publishers) > 0 else None
+
+
+def get_coverages(entity: sippy.IntellectualEntity) -> list[tuple[str, str]] | None:
+    spatial = [("ruimte", get_nl_string(ruimte.name)) for ruimte in entity.spatial]
+    temporal = (
+        [("tijd", tijd) for tijd in get_nl_strings(entity.temporal)]
+        if entity.temporal
+        else []
+    )
+
+    coverages = spatial + temporal
+    return coverages if len(coverages) > 0 else None
+
+
+def get_dc_types(entity: sippy.IntellectualEntity) -> list[tuple[str, str]] | None:
+    return (
+        [("multiselect", genre) for genre in get_nl_strings(entity.genre)]
+        if entity.genre
+        else None
+    )
+
+
+def get_dc_subjects(entity: sippy.IntellectualEntity) -> list[tuple[str, str]] | None:
+    return (
+        [("Trefwoord", trefwoord) for trefwoord in get_nl_strings(entity.keywords)]
+        if entity.keywords
+        else None
+    )

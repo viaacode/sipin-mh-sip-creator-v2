@@ -1,4 +1,4 @@
-from sippy import SIP, Concept
+from sippy import SIP
 
 from . import common
 
