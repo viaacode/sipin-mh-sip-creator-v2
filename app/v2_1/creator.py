@@ -11,7 +11,7 @@ from sippy.sip import SIP
 from . import profiles
 
 
-def generate_mh_sidecar_dict(sip: sippy.SIP):  # TODO: return type
+def generate_mh_sidecar_dict(sip: sippy.SIP) -> dict:
     splitted = sip.profile.split("/")
     profile = splitted[-1]
     version = splitted[-2]

@@ -7,28 +7,28 @@
           <mh:ExternalId>{{ pid }}</mh:ExternalId>
         </mhs:Administrative>
         <mhs:Descriptive>
-          {%- for tag in sidecar["Descriptive"].keys() %}
-            {%- if sidecar["Descriptive"][tag].__class__.__name__ == 'list' and  sidecar["Descriptive"][tag]%}
-            <{{ tag }}>
-              {%- for item in sidecar["Descriptive"][tag] %}
-                <{{ item[0] }}>{{ item[1] }}</{{ item[0] }}>
-              {%- endfor %}
-            </{{ tag }}>
-            {%- elif sidecar["Descriptive"][tag] %}
-              <{{ tag }}>{{ sidecar["Descriptive"][tag] }}</{{ tag }}>
-            {%- endif %}
-          {%- endfor %}        
+        {%- for tag in sidecar["Descriptive"].keys() %}
+          {%- if sidecar["Descriptive"][tag].__class__.__name__ == 'list' and  sidecar["Descriptive"][tag]%}
+          <{{ tag }}>
+            {%- for item in sidecar["Descriptive"][tag] %}
+            <{{ item[0] }}>{{ item[1] }}</{{ item[0] }}>
+            {%- endfor %}
+          </{{ tag }}>
+          {%- elif sidecar["Descriptive"][tag] %}
+          <{{ tag }}>{{ sidecar["Descriptive"][tag] }}</{{ tag }}>
+          {%- endif %}
+        {%- endfor %}        
         </mhs:Descriptive>
         <mhs:Dynamic>
           {%- for tag in sidecar["Dynamic"].keys() %}
             {%- if sidecar["Dynamic"][tag].__class__.__name__ == 'list' and  sidecar["Dynamic"][tag]%}
-            <{{ tag }}>
-              {%- for item in sidecar["Dynamic"][tag] %}
-                <{{ item[0] }}>{{ item[1] }}</{{ item[0] }}>
-              {%- endfor %}
-            </{{ tag }}>
+          <{{ tag }}>
+            {%- for item in sidecar["Dynamic"][tag] %}
+            <{{ item[0] }}>{{ item[1] }}</{{ item[0] }}>
+            {%- endfor %}
+          </{{ tag }}>
             {%- elif sidecar["Dynamic"][tag] %}
-              <{{ tag }}>{{ sidecar["Dynamic"][tag] }}</{{ tag }}>
+          <{{ tag }}>{{ sidecar["Dynamic"][tag] }}</{{ tag }}>
             {%- endif %}
           {%- endfor %}
           <dc_title>{{ ie.name.nl }}</dc_title>

@@ -42,4 +42,5 @@ def test_examples(sip_path: Path):
     sip = sippy.SIP.deserialize(data)
 
     creator_fn = get_sip_creator(sip)
-    creator_fn(sip, "test_pid", "Disk", "25.1")
+    mets = creator_fn(sip, "test_pid", "Disk", "25.1")
+    print(mets)
