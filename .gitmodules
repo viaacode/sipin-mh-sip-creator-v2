@@ -3,6 +3,6 @@
 	url = https://github.com/viaacode/sip-examples.git
 	branch = main
 [submodule "tests/transformator"]
-	path = transformator
+	path = tests/transformator
 	url = https://github.com/viaacode/sipin-meemoo-sip-2-transformator.git
 	branch = main
