@@ -1,13 +1,16 @@
 from typing import Any
+from urllib.parse import urlparse 
+from pathlib import Path
 
-from sippy import SIP, Concept, LangStrings, QuantitativeValue, UniqueLangStrings
+import sippy
+from sippy import UniqueLangStrings, LangStrings
 
 # TODO: ContentCategory (wachten op sip.py mapping van mets/@TYPE)
 # TODO: local identifiers (wachten op sip.py mapping van local id soort)
 # TODO: secundaire titels
 
 
-def get_mh_mapping(sip: SIP) -> dict[str, Any]:
+def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
     ie = sip.entity
 
     mapping = {
@@ -30,14 +33,14 @@ def get_mh_mapping(sip: SIP) -> dict[str, Any]:
             ]
             if ie.keywords
             else None,
-            "dc_identifier_localid": ie.local_identifier[0].value
-            if len(ie.local_identifier)
-            else None,
+            "dc_identifier_localid": next((primary_id.value for primary_id in ie.primary_identifier), None),
             "dc_identifier_localids": [
-                ("local_id", local_id.value) for local_id in ie.local_identifier
+                (get_local_id_type(local_id), local_id.value) for local_id in ie.local_identifier
             ],
             "dc_languages": [("multiselect", lang) for lang in ie.in_language],
-            "dc_titles": [("title", title.id) for title in ie.is_part_of],
+            "dc_titles": [
+                ("title", title.id) for title in ie.is_part_of
+            ],  # TODO: what is this?
             "dc_creators": [
                 (creator.role_name, get_nl_string(creator.creator.name))
                 for creator in ie.creator
@@ -82,7 +85,7 @@ def get_mh_mapping(sip: SIP) -> dict[str, Any]:
     return mapping
 
 
-def quantitive_value_to_millimetres(dimension: QuantitativeValue | None) -> str:
+def quantitive_value_to_millimetres(dimension: sippy.QuantitativeValue | None) -> str:
     if dimension is None:
         return "0"
 
@@ -122,7 +125,7 @@ def get_optional_nl_string(
     return get_nl_string(strings)
 
 
-def get_licenses(sip: SIP) -> list[tuple[str, str]]:
+def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
     if len(sip.entity.license) == 0:
         return [
             ("multiselect", "VIAA-ONDERWIJS"),
@@ -137,7 +140,7 @@ def get_licenses(sip: SIP) -> list[tuple[str, str]]:
     return [
         ("multiselect", get_nl_string(license.pref_label))
         for license in sip.entity.license
-        if isinstance(license, Concept)
+        if isinstance(license, sippy.Concept)  # TODO: wat als dit geen concept is?
     ]
 
 
@@ -152,3 +155,8 @@ def deepmerge(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Any]:
         else:
             result[key] = value
     return result
+
+
+def get_local_id_type(local_id: sippy.LocalIdentifier) -> str:
+    local_id_url = local_id.type
+    return Path(urlparse(local_id_url).path).name

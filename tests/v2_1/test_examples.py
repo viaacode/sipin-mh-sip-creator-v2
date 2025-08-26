@@ -16,7 +16,7 @@ try:
     from transformator.v2_1 import transform_sip
 except ImportError:
     raise ImportError(
-        "Install the transformator to run the tests: pip install -e ./tests/transformator --extra-index-url http://do-prd-mvn-01.do.viaa.be:8081/repository/pypi-all/simple --trusted-host do-prd-mvn-01.do.viaa.be --upgrade"
+        "Install the transformator to run the tests: pip install -e './tests/transformator[dev]' --extra-index-url http://do-prd-mvn-01.do.viaa.be:8081/repository/pypi-all/simple --trusted-host do-prd-mvn-01.do.viaa.be --upgrade"
     )
 
 
