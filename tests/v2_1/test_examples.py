@@ -1,9 +1,10 @@
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 import sippy
-from app.utils import get_sip_creator
+from app.utils import get_mets_creator, get_sip_creator
 
 
 """
@@ -32,15 +33,38 @@ exclude = [
 excluded_paths = {Path(p) for p in exclude}
 
 sip_paths = sip_paths - excluded_paths
-unzipped_paths = [(next(path.iterdir())) for path in sip_paths]
-unzipped_path_names = [str(path.parent.name) for path in unzipped_paths]
+sip_paths = [(next(path.iterdir())) for path in sip_paths]
+sip_path_names = [str(path.parent.name) for path in sip_paths]
 
 
-@pytest.mark.parametrize("sip_path", unzipped_paths, ids=unzipped_path_names)
-def test_examples(sip_path: Path):
+@pytest.fixture
+def config():
+    return {
+        "aip_folder": "tests/output/",
+        "mh_sidecar_version": "25.1",
+        "storage": {
+            "default_archive_location": "Disk",
+            "tape_content_partners": "",
+            "disk_content_partners": "",
+        },
+        "cleanup_sip": "False",
+    }
+
+
+@pytest.mark.parametrize("sip_path", sip_paths, ids=sip_path_names)
+def test_generate_mediahaven_mets(sip_path: Path):
     data = transform_sip(sip_path)
     sip = sippy.SIP.deserialize(data)
 
-    creator_fn = get_sip_creator(sip)
-    mets = creator_fn(sip, "test_pid", "Disk", "25.1")
+    mets_creator_fn = get_mets_creator(sip)
+    mets = mets_creator_fn(sip, sip.entity.identifier, "Disk", "25.1")
     print(mets)
+
+
+@pytest.mark.parametrize("sip_path", sip_paths, ids=sip_path_names)
+def test_create_mediahave_sip(sip_path: Path, config: dict[str, Any]):
+    data = transform_sip(sip_path)
+    sip = sippy.SIP.deserialize(data)
+
+    sip_creator_fn = get_sip_creator(sip)
+    sip_creator_fn(sip, config, sip.entity.identifier)

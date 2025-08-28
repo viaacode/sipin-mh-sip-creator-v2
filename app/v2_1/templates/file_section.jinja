@@ -1,10 +1,12 @@
 <mets:fileSec>
     <mets:fileGrp USE="Original">
-        {% for file in files %}
+        {%- for file in files %}
         <mets:file ID="{{ file.id }}" CHECKSUM="{{ file.checksum }}" CHECKSUMTYPE="MD5" USE="{{ file.archive_location }}">
-            <mets:FLocat xlink:href="representation_{{ file.representation_index }}/{{ file.original_name }}" LOCTYPE="URL" />
+            <mets:FLocat xlink:href="{{ file.href }}" LOCTYPE="URL" />
         </mets:file>
-        {% endfor %}
+        {%- endfor %}
+
+        {# TODO: Should this always be disk? #}
         <mets:file ID="FILEID-METS" USE="Disk">
             <mets:FLocat xlink:href="mets.xml" LOCTYPE="URL" />
         </mets:file>

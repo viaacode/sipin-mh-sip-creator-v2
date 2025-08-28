@@ -1,17 +1,19 @@
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
+from pathlib import Path
+from typing import Any
+import shutil
+import zipfile
 
 from jinja2 import Environment, PackageLoader
 
 import sippy
 
-from sippy.sip import SIP
-
 from . import profiles
 
 
-def generate_mh_sidecar_dict(sip: sippy.SIP) -> dict:
+def create_mh_sidecar_data(sip: sippy.SIP) -> dict:
     splitted = sip.profile.split("/")
     profile = splitted[-1]
     version = splitted[-2]
@@ -37,18 +39,17 @@ def get_jinja_template():
     return env.get_template("base.jinja")
 
 
-def generate_mets_from_sip(
-    sip: SIP,
+def create_mh_mets_data(
+    sip: sippy.SIP,
     pid: str,
     archive_location: Literal["Disk", "Tape"],
     mh_sidecar_version: str,
-) -> str:
+) -> dict[str, Any]:
     """
-    Generate a METS XML file from a SIP instance.
+    Create the data needed to render a METS XML file.
     """
 
     profile = str(sip.profile).split("/")[-1]
-    template = get_jinja_template()
 
     files = []
 
@@ -57,58 +58,106 @@ def generate_mets_from_sip(
         for r in sip.entity.is_represented_by
         if isinstance(r, sippy.DigitalRepresentation)
     ]
-    for representation_index, representation in enumerate(digital_representations):
-        for file_index, file in enumerate(representation.includes):
+    for rep_idx, representation in enumerate(digital_representations):
+        for file_idx, file in enumerate(representation.includes):
             if file.stored_at.file_path is None:
                 raise ValueError(
                     "The file path on SIP.py File must be present in order to create a MediaHaven SIP."
                 )
-
-            file_path = Path(file.stored_at.file_path)
-            file_name = file_path.name
 
             if file.fixity is None:
                 raise ValueError(
                     "The fixity on SIP.py File must be present in order to create a MediaHaven SIP."
                 )
 
+            file_path = Path(file.stored_at.file_path)
+            file_name = file_path.name
+
             files.append(
                 {
-                    "id": f"FILEID-{profile.upper()}-REPRESENTATION-{representation_index}-{file_index}",
-                    "representation_index": representation_index,
-                    "file_index": file_index,
+                    #
+                    # file section
+                    "id": f"FILEID-{profile.upper()}-REPRESENTATION-{rep_idx}-{file_idx}",
                     "original_name": file_name,
                     "checksum": file.fixity.value,
                     "archive_location": archive_location,
+                    "source_href": file_path,
+                    "href": f"representation_{rep_idx}/{file_name}",
+                    #
+                    # file DMD section
+                    "dmd_id": f"DMDID-{profile.upper()}-REPRESENTATION-{rep_idx}-{file_idx}",
+                    "external_id": f"{pid}_{rep_idx}_{file_idx}",
+                    "pid": pid,
+                    "cp_id": sip.entity.maintainer.identifier,
+                    "sp_name": "sipin",
                 }
             )
 
-    sidecar = generate_mh_sidecar_dict(sip)
+    sidecar = create_mh_sidecar_data(sip)
 
-    dmd_secs = []
-    for file in files:
-        dmd_secs.append(
-            {
-                "id": file["id"].replace("FILEID", "DMDID"),
-                "original_name": file["original_name"],
-                "external_id": f"{pid}_{file['representation_index']}_{file['file_index']}",
-                "pid": pid,
-                "cp_id": sip.entity.maintainer.identifier,
-                "sp_name": "sipin",
-            }
-        )
-
-    data = {
+    return {
         "mh_sidecar_version": mh_sidecar_version,
         "createdate": datetime.now().isoformat(),
         "profile": profile,
         "pid": pid,
         "files": files,
-        "dmd_sections": dmd_secs,
         "ie": sip.entity,
         "events": sip.events,
         "archive_location": archive_location,
         "sidecar": sidecar,
     }
 
-    return template.render(data)
+
+def create_mediahaven_sip(sip: sippy.SIP, config: dict[str, Any], pid: str) -> None:
+    mh_sidecar_version = config["mh_sidecar_version"]
+    aip_folder = config["aip_folder"]
+    archive_location = determine_archive_location(sip, config)
+    mets_data = create_mh_mets_data(sip, pid, archive_location, mh_sidecar_version)
+
+    template = get_jinja_template()
+    mets_xml = template.render(mets_data)
+    mh_sip_path = Path(aip_folder) / pid
+
+    mh_sip_path.mkdir(parents=True, exist_ok=True)
+    mets_file_path = mh_sip_path / "mets.xml"
+    with open(mets_file_path, "w") as mets_file:
+        mets_file.write(mets_xml)
+
+    for file in mets_data["files"]:
+        dest_href = mh_sip_path / Path(file["href"])
+        dest_href.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(file["source_href"], dest_href)
+
+    with zipfile.ZipFile(mh_sip_path.with_suffix(".zip"), "w") as zf:
+        for path in mh_sip_path.rglob("*"):
+            zf.write(path, arcname=path.relative_to(mh_sip_path))
+
+    # Option used only in testing
+    if config.get("cleanup_sip", "True") == "True":
+        shutil.rmtree(mh_sip_path)
+
+
+def determine_archive_location(
+    sip: sippy.SIP, config: dict[str, Any]
+) -> Literal["Disk", "Tape"]:
+    """
+    Determines the archive location for the SIP based on its maintainer.
+    """
+    cp_id = sip.entity.maintainer.identifier
+
+    tape_content_partners = [
+        or_id.strip().lower()
+        for or_id in config["storage"]["tape_content_partners"].split(",")
+    ]
+    disk_content_partners = [
+        or_id.strip().lower()
+        for or_id in config["storage"]["disk_content_partners"].split(",")
+    ]
+
+    if cp_id.lower() in tape_content_partners:
+        return "Tape"
+    elif cp_id.lower() in disk_content_partners:
+        return "Disk"
+
+    archive_location = config["storage"]["default_archive_location"]
+    return archive_location

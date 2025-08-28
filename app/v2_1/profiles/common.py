@@ -1,6 +1,7 @@
 from typing import Any
 from urllib.parse import urlparse
 from pathlib import Path
+from datetime import datetime
 
 import sippy
 from sippy import UniqueLangStrings, LangStrings
@@ -51,6 +52,66 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
                 ("depth_in_mm", quantitive_value_to_millimetres(ie.depth)),
                 ("weight_in_kg", quantitive_value_to_millimetres(ie.weight)),
             ],
+            #
+            # Premis events
+            "inspection_date": get_event_date(
+                sip, "https://data.hetarchief.be/id/event-type/inspection"
+            ),
+            "inspection_outcome": get_event_outcome(
+                sip, "https://data.hetarchief.be/id/event-type/inspection"
+            ),
+            "inspection_note": get_event_note(
+                sip, "https://data.hetarchief.be/id/event-type/inspection"
+            ),
+            "repair_date": get_event_date(
+                sip, "https://data.hetarchief.be/id/event-type/repair"
+            ),
+            "repair_outcome": get_event_outcome(
+                sip, "https://data.hetarchief.be/id/event-type/repair"
+            ),
+            "repair_note": get_event_note(
+                sip, "https://data.hetarchief.be/id/event-type/repair"
+            ),
+            "cleaning_date": get_event_date(
+                sip, "https://data.hetarchief.be/id/event-type/cleaning"
+            ),
+            "cleaning_outcome": get_event_outcome(
+                sip, "https://data.hetarchief.be/id/event-type/cleaning"
+            ),
+            "cleaning_note": get_event_note(
+                sip, "https://data.hetarchief.be/id/event-type/cleaning"
+            ),
+            "baking_date": get_event_date(
+                sip, "https://data.hetarchief.be/id/event-type/baking"
+            ),
+            "baking_outcome": get_event_outcome(
+                sip, "https://data.hetarchief.be/id/event-type/baking"
+            ),
+            "baking_note": get_event_note(
+                sip, "https://data.hetarchief.be/id/event-type/baking"
+            ),
+            "digitization_date": get_event_date(
+                sip, "https://data.hetarchief.be/id/event-type/digitization"
+            ),
+            "digitization_time": get_event_time(
+                sip, "https://data.hetarchief.be/id/event-type/digitization"
+            ),
+            "digitization_outcome": get_event_outcome(
+                sip, "https://data.hetarchief.be/id/event-type/digitization"
+            ),
+            "digitization_note": get_event_note(
+                sip, "https://data.hetarchief.be/id/event-type/digitization"
+            ),
+            "qc_date": get_event_date(
+                sip, "https://data.hetarchief.be/id/event-type/quality-control"
+            ),
+            "qc_outcome": get_event_outcome(
+                sip, "https://data.hetarchief.be/id/event-type/quality-control"
+            ),
+            "qc_note": get_event_note(
+                sip, "https://data.hetarchief.be/id/event-type/quality-control"
+            ),
+            "qc_by": None,
         },
     }
 
@@ -202,3 +263,57 @@ def get_dc_subjects(entity: sippy.IntellectualEntity) -> list[tuple[str, str]] |
         if entity.keywords
         else None
     )
+
+
+def get_event_with_type(
+    sip: sippy.SIP, event_type: sippy.EventClass
+) -> sippy.Event | None:
+    for event in sip.events:
+        if event.type == event_type:
+            return event
+
+    return None
+
+
+def get_event_date(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
+    event = get_event_with_type(sip, event_type)
+    if event is None:
+        return None
+    return datetime.fromisoformat(event.started_at_time.value).date().isoformat()
+
+
+def get_event_time(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
+    event = get_event_with_type(sip, event_type)
+    if event is None:
+        return None
+    return datetime.fromisoformat(event.started_at_time.value).time().isoformat()
+
+
+def get_event_outcome(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
+    event = get_event_with_type(sip, event_type)
+    if event is None:
+        return None
+    if event.outcome is None:
+        return "n"
+
+    match event.outcome.id:
+        case "http://id.loc.gov/vocabulary/preservation/eventOutcome/fai":
+            return "n"
+        case "http://id.loc.gov/vocabulary/preservation/eventOutcome/suc":
+            return "y"
+        case "http://id.loc.gov/vocabulary/preservation/eventOutcome/war":
+            return "y"
+
+
+def get_event_note(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
+    event = get_event_with_type(sip, event_type)
+    if event is None:
+        return None
+    return event.note
+
+
+def get_quality_control_by(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
+    event = get_event_with_type(sip, event_type)
+    if event is None:
+        return None
+    return get_nl_string(event.implemented_by.name)

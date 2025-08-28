@@ -18,12 +18,24 @@ def parse_profile_url(sip: sippy.SIP) -> tuple[Profile, Version]:
     return profile, version
 
 
+def get_mets_creator(sip: sippy.SIP):
+    _, version = parse_profile_url(sip)
+
+    match version:
+        case "2.1":
+            return v2_1.create_mh_mets_data
+        case _:
+            raise ValueError(
+                f"Received SIP.py SIP with invalid profile version '{version}'"
+            )
+
+
 def get_sip_creator(sip: sippy.SIP):
     _, version = parse_profile_url(sip)
 
     match version:
         case "2.1":
-            return v2_1.generate_mets_from_sip
+            return v2_1.create_mediahaven_sip
         case _:
             raise ValueError(
                 f"Received SIP.py SIP with invalid profile version '{version}'"
