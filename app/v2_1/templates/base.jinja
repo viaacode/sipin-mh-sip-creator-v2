@@ -8,13 +8,13 @@
   
   {% include "header.jinja" %}
   {% include "dmd_sections.jinja" %}
-  {# {% include "amd_sections.jinja" %} #}
+  {% include "amd_sections.jinja" %}
   {% include "file_section.jinja" %}
-  {% if profile == 'film' %}
+  {%- if profile == 'film' %}
     {% include "profiles/film_struct_map.jinja" %}
-  {% elif profile == 'basic' %}
+  {%- elif profile == 'basic' %}
     {% include "profiles/basic_struct_map.jinja" %}
-  {% elif profile == 'material-artwork' %}
+  {%- elif profile == 'material-artwork' %}
     {% include "profiles/material_artwork_struct_map.jinja" %}
-  {% endif %}
+  {%- endif %}
 </mets:mets>

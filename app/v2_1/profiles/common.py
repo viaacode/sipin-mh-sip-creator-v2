@@ -1,10 +1,12 @@
+from os import ST_WRITE
 from typing import Any
 from urllib.parse import urlparse
 from pathlib import Path
 from datetime import datetime
 
 import sippy
-from sippy import UniqueLangStrings, LangStrings
+
+from ..langstrings import get_nl_string, get_nl_strings, get_optional_nl_string
 
 # TODO: ContentCategory (wachten op sip.py mapping van mets/@TYPE)
 # TODO: local identifiers (wachten op sip.py mapping van local id soort)
@@ -35,7 +37,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             ),
             "dc_identifier_localids": get_dc_identifier_localids(ie),
             "dc_languages": [("multiselect", lang) for lang in ie.in_language],
-            "dc_titles": [("title", title.id) for title in ie.is_part_of],
+            "dc_titles": get_dc_titles(ie),
             "dc_creators": get_creators(ie),
             "dc_contributors": get_contributors(ie),
             "dc_publishers": get_publishers(ie),
@@ -136,26 +138,6 @@ def quantitive_value_to_millimetres(dimension: sippy.QuantitativeValue | None) -
         return str(value)
 
     return "0"
-
-
-def get_nl_strings(strings: LangStrings | UniqueLangStrings) -> list[str]:
-    return [
-        lang_string.value for lang_string in strings.root if lang_string.lang == "nl"
-    ]
-
-
-def get_nl_string(strings: LangStrings | UniqueLangStrings) -> str:
-    return next(
-        lang_string.value for lang_string in strings.root if lang_string.lang == "nl"
-    )
-
-
-def get_optional_nl_string(
-    strings: LangStrings | UniqueLangStrings | None,
-) -> str | None:
-    if strings is None:
-        return None
-    return get_nl_string(strings)
 
 
 def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
@@ -317,3 +299,37 @@ def get_quality_control_by(sip: sippy.SIP, event_type: sippy.EventClass) -> str 
     if event is None:
         return None
     return get_nl_string(event.implemented_by.name)
+
+
+def get_dc_titles(ie: sippy.IntellectualEntity) -> list[tuple[str, str]]:
+    titles: list[tuple[str, str]] = []
+    for item in ie.schema_is_part_of:
+        match item:
+            case sippy.BroadcastEvent():
+                titles.append(("programma", get_nl_string(item.name)))
+            case sippy.Newspaper():
+                # Dit heeft geen mapping nodig naar dc_titles
+                pass
+            case sippy.CreativeWorkSeason():
+                titles.append(("seizoen", get_nl_string(item.name)))
+            case sippy.CreativeWorkSeries():
+                titles.append(("serie", get_nl_string(item.name)))
+            case sippy.ArchiveComponent():
+                titles.append(("archief", get_nl_string(item.name)))
+                sub_archives = [
+                    sub
+                    for sub in item.has_part
+                    if isinstance(sub, sippy.ArchiveComponent)
+                ]
+                for sub_archive in sub_archives:
+                    titles.append(("deelarchief", get_nl_string(sub_archive.name)))
+
+            case sippy.Episode():
+                titles.append(("aflevering", get_nl_string(item.name)))
+            case sippy.CreativeWork():
+                # Dit heeft geen mapping nodig naar dc_titles
+                pass
+            case _:
+                raise NotImplementedError()
+
+    return titles

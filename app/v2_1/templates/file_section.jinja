@@ -1,14 +1,14 @@
 <mets:fileSec>
-    <mets:fileGrp USE="Original">
-        {%- for file in files %}
-        <mets:file ID="{{ file.id }}" CHECKSUM="{{ file.checksum }}" CHECKSUMTYPE="MD5" USE="{{ file.archive_location }}">
-            <mets:FLocat xlink:href="{{ file.href }}" LOCTYPE="URL" />
-        </mets:file>
-        {%- endfor %}
+  <mets:fileGrp USE="Original">
+    {%- for file in files %}
+    <mets:file ID="{{ file.id }}" CHECKSUM="{{ file.checksum }}" CHECKSUMTYPE="MD5" USE="{{ file.archive_location }}">
+      <mets:FLocat xlink:href="{{ file.href }}" LOCTYPE="URL" />
+    </mets:file>
+    {%- endfor %}
 
-        {# TODO: Should this always be disk? #}
-        <mets:file ID="FILEID-METS" USE="Disk">
-            <mets:FLocat xlink:href="mets.xml" LOCTYPE="URL" />
-        </mets:file>
-    </mets:fileGrp>
+    {# TODO: Should this always be disk? #}
+    <mets:file ID="FILEID-METS" USE="Disk">
+      <mets:FLocat xlink:href="mets.xml" LOCTYPE="URL" />
+    </mets:file>
+  </mets:fileGrp>
 </mets:fileSec>

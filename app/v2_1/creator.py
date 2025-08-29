@@ -102,7 +102,7 @@ def create_mh_mets_data(
         "pid": pid,
         "files": files,
         "ie": sip.entity,
-        "events": sip.events,
+        "events": [transform_event(event) for event in sip.events],
         "archive_location": archive_location,
         "sidecar": sidecar,
     }
@@ -161,3 +161,15 @@ def determine_archive_location(
 
     archive_location = config["storage"]["default_archive_location"]
     return archive_location
+
+
+def transform_event(event: sippy.Event) -> dict[str, Any]:
+    return {
+        "identifier": {
+            "type": "UUID",
+            "value": event.id.split("/")[-1],
+        },
+        "type": event.type.split("/")[-1],
+        "datetime": event.started_at_time.value,
+        "detail": event.note,
+    }

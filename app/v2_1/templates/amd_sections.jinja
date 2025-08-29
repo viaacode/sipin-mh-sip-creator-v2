@@ -1,15 +1,25 @@
 <mets:amdSec ID="EVENTS">
-  {% for event in events %}
-  <mets:digiprovMD>
+  {%- for event in events %}
+  <mets:digiprovMD ID="PREMISID-{{ event.identifier.value }}">
     <mets:mdWrap MDTYPE="PREMIS:EVENT">
       <mets:xmlData>
         <premis:event>
+          <premis:eventIdentifier>
+             <premis:eventIdentifierType>{{ event.identifier.type }}</premis:eventIdentifierType>
+             <premis:eventIdentifierValue>{{ event.identifier.value }}</premis:eventIdentifierValue>
+          </premis:eventIdentifier>
           <premis:eventType>{{ event.type }}</premis:eventType>
-          <premis:eventDateTime>{{ event.started_at_time.value }}</premis:eventDateTime>          
+          <premis:eventDateTime>{{ event.datetime }}</premis:eventDateTime>          
+          {%- if event.detail %}
+          <premis:eventDetailInformation>
+             <premis:eventDetail>{{ event.detail }}</premis:eventDetail>
+          </premis:eventDetailInformation>
+          {%- endif %}
+
           {# <premis:linkingAgentIdentifier>
-            <premis:linkingAgentIdentifierType>{{ agent.type }}</premis:linkingAgentIdentifierType>
-            <premis:linkingAgentIdentifierValue>{{ agent.value }}</premis:linkingAgentIdentifierValue>
-            {% if agent.role %}
+            <premis:linkingAgentIdentifierType>{{ event.agent.type }}</premis:linkingAgentIdentifierType>
+            <premis:linkingAgentIdentifierValue>{{ event.agent.value }}</premis:linkingAgentIdentifierValue>
+            {% if event.agent.role %}
             <premis:linkingAgentRole>{{ agent.role }}</premis:linkingAgentRole>
             {% endif %}
           </premis:linkingAgentIdentifier> #}
@@ -17,5 +27,5 @@
       </mets:xmlData>
     </mets:mdWrap>
   </mets:digiprovMD>
-  {% endfor %}
+  {%- endfor %}
 </mets:amdSec>

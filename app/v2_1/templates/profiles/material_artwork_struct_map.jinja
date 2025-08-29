@@ -5,12 +5,12 @@
         <mets:fptr FILEID="FILEID-METS" />
       </mets:div>
     </mets:div>
-    {% for file in files %}
+    {%- for file in files %}
     <mets:div TYPE="Media" DMDID="{{ file.dmd_id }}">
       <mets:div TYPE="Representation" LABEL="Original">
         <mets:fptr FILEID="{{ file.id }}" />
       </mets:div>
     </mets:div>
-    {% endfor %}
+    {%- endfor %}
   </mets:div>
 </mets:structMap>
