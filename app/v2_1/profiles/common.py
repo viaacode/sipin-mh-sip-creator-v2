@@ -1,4 +1,3 @@
-from os import ST_WRITE
 from typing import Any
 from urllib.parse import urlparse
 from pathlib import Path
@@ -113,7 +112,9 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "qc_note": get_event_note(
                 sip, "https://data.hetarchief.be/id/event-type/quality-control"
             ),
-            "qc_by": None,
+            "qc_by": get_event_implementer(
+                sip, "https://data.hetarchief.be/id/event-type/quality-control"
+            ),
         },
     }
 
@@ -295,6 +296,13 @@ def get_event_note(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
 
 
 def get_quality_control_by(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
+    event = get_event_with_type(sip, event_type)
+    if event is None:
+        return None
+    return get_nl_string(event.implemented_by.name)
+
+
+def get_event_implementer(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
     event = get_event_with_type(sip, event_type)
     if event is None:
         return None
