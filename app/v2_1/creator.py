@@ -6,7 +6,7 @@ from typing import Any
 import shutil
 import zipfile
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 import sippy
 
@@ -35,7 +35,10 @@ def get_jinja_template():
     """
     Gets the `templates/base.jinja` within the current package.
     """
-    env = Environment(loader=PackageLoader(__name__))
+    env = Environment(
+        loader=PackageLoader(__name__),
+        autoescape=True,
+    )
     return env.get_template("base.jinja")
 
 
