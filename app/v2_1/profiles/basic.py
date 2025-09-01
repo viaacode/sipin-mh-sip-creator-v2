@@ -3,6 +3,7 @@ from typing import Any
 from sippy import SIP
 
 from . import common
+from . import helpers
 
 
 def get_mh_mapping(sip: SIP) -> dict[str, Any]:
@@ -13,4 +14,4 @@ def get_mh_mapping(sip: SIP) -> dict[str, Any]:
         },
     }
 
-    return common.deepmerge(common_fields, basic_fields)
+    return helpers.deepmerge(common_fields, basic_fields)

@@ -8,8 +8,6 @@ import sippy
 from ..langstrings import get_nl_string, get_nl_strings, get_optional_nl_string
 
 # TODO: ContentCategory (wachten op sip.py mapping van mets/@TYPE)
-# TODO: local identifiers (wachten op sip.py mapping van local id soort)
-# TODO: secundaire titels
 
 
 def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
@@ -115,6 +113,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "qc_by": get_event_implementer(
                 sip, "https://data.hetarchief.be/id/event-type/quality-control"
             ),
+            # "batch_pickup_date" TODO
         },
     }
 
@@ -158,19 +157,6 @@ def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
         for license in sip.entity.license
         if isinstance(license, sippy.Concept)  # TODO: wat als dit geen concept is?
     ]
-
-
-def deepmerge(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Any]:
-    result = dict1.copy()
-    for key, value in dict2.items():
-        if key in result:
-            if isinstance(result[key], dict) and isinstance(value, dict):
-                result[key] = deepmerge(result[key], value)
-            else:
-                raise ValueError()
-        else:
-            result[key] = value
-    return result
 
 
 def get_dc_identifier_localids(entity: sippy.IntellectualEntity):

@@ -1,9 +1,12 @@
+from typing import Any
+
 from sippy import SIP, Concept, LangStrings, QuantitativeValue, UniqueLangStrings
 
 from . import common
+from . import helpers
 
 
-def get_mh_mapping(sip: SIP) -> dict:
+def get_mh_mapping(sip: SIP) -> dict[str, Any]:
     common_fields = common.get_mh_mapping(sip)
     material_artwork_fields = {
         "Dynamic": {
@@ -11,7 +14,7 @@ def get_mh_mapping(sip: SIP) -> dict:
         },
     }
 
-    return common.deepmerge(common_fields, material_artwork_fields)
+    return helpers.deepmerge(common_fields, material_artwork_fields)
 
 
 def quantitive_value_to_millimetres(dimension: QuantitativeValue | None) -> str:
