@@ -1,5 +1,5 @@
 <mets:structMap>
-  <mets:div TYPE="MaterialArtwork" DMDID="DMDID-MATERIAL-ARTWORK">
+  <mets:div TYPE="MaterialArtwork" DMDID="DMDID-MATERIAL-ARTWORK" {% if amdid != '' %}ADMID="{{ amdid }}"{% endif %}>
     <mets:div TYPE="Media" DMDID="DMDID-MATERIAL-ARTWORK-METS">
       <mets:div TYPE="Representation" LABEL="Original">
         <mets:fptr FILEID="FILEID-METS" />

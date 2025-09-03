@@ -1,5 +1,5 @@
 <mets:structMap>
-  <mets:div TYPE="Film" DMDID="DMDID-FILM">
+  <mets:div TYPE="Film" DMDID="DMDID-FILM" {% if amdid != '' %}ADMID="{{ amdid }}"{% endif %}>
     <mets:div TYPE="Media" DMDID="DMDID-FILM-METS">
       <mets:div TYPE="Representation" LABEL="Original">
         <mets:fptr FILEID="FILEID-METS" />

@@ -35,7 +35,7 @@ def get_sip_creator(sip: sippy.SIP):
 
     match version:
         case "2.1":
-            return v2_1.create_mediahaven_sip
+            return v2_1.write_mediahaven_sip
         case _:
             raise ValueError(
                 f"Received SIP.py SIP with invalid profile version '{version}'"

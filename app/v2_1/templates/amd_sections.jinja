@@ -1,6 +1,6 @@
 <mets:amdSec ID="EVENTS">
   {%- for event in events %}
-  <mets:digiprovMD ID="PREMISID-{{ event.identifier.value }}">
+  <mets:digiprovMD ID="{{ event.mets_id }}">
     <mets:mdWrap MDTYPE="PREMIS:EVENT">
       <mets:xmlData>
         <premis:event>
@@ -15,14 +15,36 @@
              <premis:eventDetail>{{ event.detail }}</premis:eventDetail>
           </premis:eventDetailInformation>
           {%- endif %}
-
-          {# <premis:linkingAgentIdentifier>
-            <premis:linkingAgentIdentifierType>{{ event.agent.type }}</premis:linkingAgentIdentifierType>
-            <premis:linkingAgentIdentifierValue>{{ event.agent.value }}</premis:linkingAgentIdentifierValue>
-            {% if event.agent.role %}
+          {%- if event.outcome or event.outcome_note %}
+          <premis:eventOutcomeInformation>
+            {%- if event.outcome %}
+            <premis:eventOutcome>{{ event.outcome }}</premis:eventOutcome>
+            {%- endif %}
+            {%- if event.outcome_note %}
+            <premis:eventOutcomeDetail>
+              <premis:eventOutcomeDetailNote>{{ event.outcome_note }}</premis:eventOutcomeDetailNote>
+            </premis:eventOutcomeDetail>
+            {%- endif %}
+          </premis:eventOutcomeInformation>
+          {%- endif %}
+          {%- for agent in event.agents %}
+          <premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifierType>{{ agent.type }}</premis:linkingAgentIdentifierType>
+            <premis:linkingAgentIdentifierValue>{{ agent.value }}</premis:linkingAgentIdentifierValue>
+            {%- if agent.role %}
             <premis:linkingAgentRole>{{ agent.role }}</premis:linkingAgentRole>
-            {% endif %}
-          </premis:linkingAgentIdentifier> #}
+            {%- endif %}
+          </premis:linkingAgentIdentifier>
+          {%- endfor %}
+          {%- for object in event.objects %}
+          <premis:linkingObjectIdentifier>
+            <premis:linkingObjectIdentifierType>{{ object.type }}</premis:linkingObjectIdentifierType>
+            <premis:linkingObjectIdentifierValue>{{ object.value }}</premis:linkingObjectIdentifierValue>
+            {%- if object.role %}
+            <premis:linkingObjectRole>{{ object.role }}</premis:linkingObjectRole>
+            {%- endif %}
+          </premis:linkingObjectIdentifier>
+          {%- endfor %}
         </premis:event>
       </mets:xmlData>
     </mets:mdWrap>

@@ -1,14 +1,15 @@
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
-from pathlib import Path
 from typing import Any
 import shutil
 import zipfile
 
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader
 
 import sippy
+
+from app.v2_1.langstrings import get_nl_string
 
 from . import profiles
 
@@ -98,6 +99,8 @@ def create_mh_mets_data(
 
     sidecar = create_mh_sidecar_data(sip)
 
+    events = [transform_event(event) for event in sip.events]
+
     return {
         "mh_sidecar_version": mh_sidecar_version,
         "createdate": datetime.now().isoformat(),
@@ -105,13 +108,14 @@ def create_mh_mets_data(
         "pid": pid,
         "files": files,
         "ie": sip.entity,
-        "events": [transform_event(event) for event in sip.events],
+        "events": events,
+        "amdid": " ".join(event["mets_id"] for event in events),
         "archive_location": archive_location,
         "sidecar": sidecar,
     }
 
 
-def create_mediahaven_sip(sip: sippy.SIP, config: dict[str, Any], pid: str) -> None:
+def write_mediahaven_sip(sip: sippy.SIP, config: dict[str, Any], pid: str) -> None:
     mh_sidecar_version = config["mh_sidecar_version"]
     aip_folder = config["aip_folder"]
     archive_location = determine_archive_location(sip, config)
@@ -168,6 +172,7 @@ def determine_archive_location(
 
 def transform_event(event: sippy.Event) -> dict[str, Any]:
     return {
+        "mets_id": "PREMIS-ID-" + event.id.split("/")[-1],
         "identifier": {
             "type": "UUID",
             "value": event.id.split("/")[-1],
@@ -175,4 +180,90 @@ def transform_event(event: sippy.Event) -> dict[str, Any]:
         "type": event.type.split("/")[-1],
         "datetime": event.started_at_time.value,
         "detail": event.note,
+        "outcome": map_event_outcome(event.outcome),
+        "outcome_note": event.outcome_note,
+        "agents": get_event_agents(event),
+        "objects": get_event_objects(event),
     }
+
+
+def map_event_outcome(outcome: sippy.URIRef[sippy.EventOutcome] | None) -> str | None:
+    if outcome is None:
+        return None
+    match outcome.id:
+        case "http://id.loc.gov/vocabulary/preservation/eventOutcome/suc":
+            return "success"
+        case "http://id.loc.gov/vocabulary/preservation/eventOutcome/war":
+            return "warning"
+        case "http://id.loc.gov/vocabulary/preservation/eventOutcome/fai":
+            return "fail"
+
+
+def get_event_agents(event: sippy.Event) -> list[dict[str, str]]:
+    implementer_agent = [
+        {
+            "type": "Implementer name",
+            "value": get_nl_string(event.implemented_by.name),
+            "role": "implementer",
+        }
+    ]
+    executing_agent = (
+        [
+            {
+                "type": "Executing program name",
+                "value": get_nl_string(event.executed_by.name),
+                "role": "executing program",
+            }
+        ]
+        if event.executed_by
+        else []
+    )
+    instrument_agents = [
+        {
+            "type": "Instrument name",
+            "value": get_nl_string(instrument.name),
+            "role": "instrument",
+        }
+        for instrument in event.instrument
+    ]
+    associated_agents = [
+        {
+            "type": "Agent name",
+            "value": get_nl_string(associated_with.name),
+            "role": "associated",
+        }
+        for associated_with in event.was_associated_with
+    ]
+
+    return implementer_agent + executing_agent + instrument_agents + associated_agents
+
+
+def get_event_objects(event: sippy.Event) -> list[dict[str, str]]:
+    results = [
+        {
+            "type": "UUID",
+            "value": result.id,
+            "role": "outcome",
+        }
+        for result in event.result
+    ]
+    sources = [
+        {
+            "type": "UUID",
+            "value": source.id,
+            "role": "source",
+        }
+        for source in event.source
+    ]
+
+    total = results + sources
+    if len(total) == 0:
+        return [
+            {
+                "type": "UUID",
+                "value": "MH required at least one linking object on events",
+                "role": "placeholder",
+            }
+        ]
+
+    return total
