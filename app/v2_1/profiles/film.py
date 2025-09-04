@@ -32,6 +32,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             # "dc_description_cast": hascastmember # TODO
             "subtitles": get_subtitles(physical_carrier),
             "language_subtitles": get_language_subtitles(physical_carrier),
+            "original_location": physical_carrier.file_path,
             #
             # Image and audio reels
             "gauge": get_gauge(physical_carrier),
