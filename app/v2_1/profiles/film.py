@@ -33,15 +33,23 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "subtitles": get_subtitles(physical_carrier),
             "language_subtitles": get_language_subtitles(physical_carrier),
             "original_location": physical_carrier.file_path,
+            "format": get_medium(physical_carrier),
+            "carrier_barcode": physical_carrier.identifier,
+            "original_carrier_id": common.get_dc_identifier_localid(sip.entity),
+            "date": sip.entity.date_created.value,
             #
             # Image and audio reels
-            "gauge": get_gauge(physical_carrier),
+            "gauge": get_medium(physical_carrier),
             "material_type": get_material_type(physical_carrier),
             "aspect_ratio": get_aspect_ratio(physical_carrier),
             "brand_of_film_stock": get_brand_of_film_stock(physical_carrier),
             #
             # Image Reel
             "color_or_bw": get_color_or_bw(physical_carrier),
+            # "barcode_image_reels": "" # TODO: bestaat dit veld?
+            "batch_pickup_date": common.get_event_date(  # TODO: wat is de correcte spelling van dit veld?
+                sip, "https://data.hetarchief.be/id/event-type/check-out"
+            ),
         },
     }
 
@@ -129,7 +137,7 @@ def get_aspect_ratio(carrier: sippy.AnyPhysicalCarrier) -> str | None:
     return carrier.aspect_ratio
 
 
-def get_gauge(carrier: sippy.AnyPhysicalCarrier) -> str | None:
+def get_medium(carrier: sippy.AnyPhysicalCarrier) -> str | None:
     if not isinstance(carrier, (sippy.ImageReel, sippy.AudioReel)):
         return None
     return carrier.storage_medium.id.split("/")[-1]

@@ -29,9 +29,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
                 for owner in ie.copyright_holder
             ],
             "dc_subjects": get_dc_subjects(ie),
-            "dc_identifier_localid": next(
-                (primary_id.value for primary_id in ie.primary_identifier), None
-            ),
+            "dc_identifier_localid": get_dc_identifier_localid(ie),
             "dc_identifier_localids": get_dc_identifier_localids(ie),
             "dc_languages": [("multiselect", lang) for lang in ie.in_language],
             "dc_titles": get_dc_titles(ie),
@@ -113,7 +111,6 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "qc_by": get_event_implementer(
                 sip, "https://data.hetarchief.be/id/event-type/quality-control"
             ),
-            # "batch_pickup_date" TODO
         },
     }
 
@@ -159,11 +156,17 @@ def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
     ]
 
 
-def get_dc_identifier_localids(entity: sippy.IntellectualEntity):
+def get_dc_identifier_localids(
+    entity: sippy.IntellectualEntity,
+) -> list[tuple[str, str]]:
     return [
         (get_local_id_type(local_id), local_id.value)
         for local_id in entity.local_identifier
     ]
+
+
+def get_dc_identifier_localid(entity: sippy.IntellectualEntity) -> str | None:
+    return next((primary_id.value for primary_id in entity.primary_identifier), None)
 
 
 def get_local_id_type(local_id: sippy.LocalIdentifier) -> str:
