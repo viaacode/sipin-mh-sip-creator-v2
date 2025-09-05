@@ -47,7 +47,7 @@ def config():
             "tape_content_partners": "",
             "disk_content_partners": "",
         },
-        "cleanup_sip": "False",
+        "cleanup_sip": False,
     }
 
 

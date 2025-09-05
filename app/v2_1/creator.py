@@ -139,8 +139,9 @@ def write_mediahaven_sip(sip: sippy.SIP, config: dict[str, Any], pid: str) -> No
         for path in mh_sip_path.rglob("*"):
             zf.write(path, arcname=path.relative_to(mh_sip_path))
 
-    # Option used only in testing
-    if config.get("cleanup_sip", "True") == "True":
+    # Cleanup is default, but for testing it is usefull disable it
+    should_cleanup = config.get("cleanup_sip", True)
+    if should_cleanup:
         shutil.rmtree(mh_sip_path)
 
 
