@@ -82,14 +82,12 @@ class EventListener:
         sip = sippy.SIP.deserialize(event_data)
         pid = self.get_pid(sip)
 
-        generate_mediahaven_sip_fn = get_sip_creator(sip)
-        mh_sip_path = generate_mediahaven_sip_fn(sip, self.config, pid)
+        write_mediahaven_sip_fn = get_sip_creator(sip)
+        mh_sip_path = write_mediahaven_sip_fn(sip, self.config, pid)
 
         # Send event on topic
         data = {
-            "source": str(
-                mh_sip_path  # FIXME: klopt dit? Moet dit niet de unzipped path zijn?
-            ),
+            "source": str(mh_sip_path),
             "host": self.config["host"],
             "paths": [
                 str(Path(f"{mh_sip_path}.zip")),
