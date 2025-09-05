@@ -115,7 +115,9 @@ def create_mh_mets_data(
     }
 
 
-def write_mediahaven_sip(sip: sippy.SIP, config: dict[str, Any], pid: str) -> Path:
+def write_mediahaven_sip(
+    sip: sippy.SIP, config: dict[str, Any], pid: str
+) -> tuple[Path, str]:
     mh_sidecar_version = config["mh_sidecar_version"]
     aip_folder = config["aip_folder"]
     archive_location = determine_archive_location(sip, config)
@@ -144,7 +146,7 @@ def write_mediahaven_sip(sip: sippy.SIP, config: dict[str, Any], pid: str) -> Pa
     if should_cleanup:
         shutil.rmtree(mh_sip_path)
 
-    return mh_sip_path
+    return mh_sip_path, mets_xml
 
 
 def determine_archive_location(

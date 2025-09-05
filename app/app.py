@@ -83,7 +83,7 @@ class EventListener:
         pid = self.get_pid(sip)
 
         write_mediahaven_sip_fn = get_sip_creator(sip)
-        mh_sip_path = write_mediahaven_sip_fn(sip, self.config, pid)
+        mh_sip_path, mets_xml = write_mediahaven_sip_fn(sip, self.config, pid)
 
         # Send event on topic
         data = {
