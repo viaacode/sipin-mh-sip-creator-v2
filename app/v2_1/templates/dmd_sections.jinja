@@ -1,0 +1,79 @@
+<mets:dmdSec ID="DMDID-{{ profile.upper()}}" CREATED="{{ createdate }}" STATUS="original">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mhs/"
+        xmlns:mh="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mh/" version="{{ mh_sidecar_version }}">
+        <mhs:Administrative>
+          <mh:ExternalId>{{ pid }}</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+        {%- for tag in sidecar["Descriptive"].keys() %}
+          {%- if sidecar["Descriptive"][tag].__class__.__name__ == 'list' and  sidecar["Descriptive"][tag]%}
+          <{{ tag }}>
+            {%- for item in sidecar["Descriptive"][tag] %}
+            <{{ item[0] }}>{{ item[1] }}</{{ item[0] }}>
+            {%- endfor %}
+          </{{ tag }}>
+          {%- elif sidecar["Descriptive"][tag] %}
+          <{{ tag }}>{{ sidecar["Descriptive"][tag] }}</{{ tag }}>
+          {%- endif %}
+        {%- endfor %}        
+        </mhs:Descriptive>
+        <mhs:Dynamic>
+          {%- for tag in sidecar["Dynamic"].keys() %}
+            {%- if sidecar["Dynamic"][tag].__class__.__name__ == 'list' and  sidecar["Dynamic"][tag]%}
+          <{{ tag }}>
+            {%- for item in sidecar["Dynamic"][tag] %}
+            <{{ item[0] }}>{{ item[1] }}</{{ item[0] }}>
+            {%- endfor %}
+          </{{ tag }}>
+            {%- elif sidecar["Dynamic"][tag] %}
+          <{{ tag }}>{{ sidecar["Dynamic"][tag] }}</{{ tag }}>
+            {%- endif %}
+          {%- endfor %}
+          <dc_title>{{ ie.name.nl }}</dc_title>
+          <PID>{{ pid }}</PID>
+          <CP_id>{{ie.maintainer.identifier}}</CP_id>
+          <sp_name>sipin</sp_name>
+        </mhs:Dynamic>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+<mets:dmdSec ID="DMDID-{{ profile.upper()}}-METS" CREATED="2023-11-20T21:44:28" STATUS="original">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mhs/"
+        xmlns:mh="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mh/" version="{{ mh_sidecar_version }}">
+        <mhs:Administrative>
+          <mh:ExternalId>{{ pid }}_mets</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:Title>{{ pid }}_mets</mh:Title>
+        </mhs:Descriptive>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+{%- for file in files %}
+<mets:dmdSec ID="{{ file.dmd_id }}">
+  <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
+    <mets:xmlData>
+      <mhs:Sidecar xmlns:mh="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mh/"
+        xmlns:mhs="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mhs/" version="{{ mh_sidecar_version }}">
+        <mhs:Administrative>
+          <mh:ExternalId>{{ file.external_id }}</mh:ExternalId>
+        </mhs:Administrative>
+        <mhs:Descriptive>
+          <mh:OriginalFilename>{{ file.original_name }}</mh:OriginalFilename>
+        </mhs:Descriptive>
+        <mhs:Dynamic>
+          <PID>{{ file.pid }}</PID>
+          <CP_id>{{ file.cp_id }}</CP_id>
+          <sp_name>{{ file.sp_name }}</sp_name>
+        </mhs:Dynamic>
+      </mhs:Sidecar>
+    </mets:xmlData>
+  </mets:mdWrap>
+</mets:dmdSec>
+{%- endfor %}
