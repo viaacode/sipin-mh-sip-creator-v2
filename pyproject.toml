@@ -5,12 +5,12 @@ description = "Service that creates a Mediahaven SIP."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "viaa-chassis",
-    "pulsar-client",
-    "meemoo-cloudevents",
+    "viaa-chassis==0.2.1",
+    "pulsar-client==3.7.0",
+    "meemoo-cloudevents==v0.1.0-rc.3",
     "SIP.py==0.0.8",
-    "requests",
-    "jinja2",
+    "requests==2.32.4",
+    "jinja2==3.1.6",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -19,9 +19,10 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "ruff",
-    "pytest",
-    "pytest-cov",
+    "ruff==0.11.10",
+    "pytest==8.4.0",
+    "pytest-cov==6.1.1",
+    "testcontainers==4.10.0",
 ]
 
 [tool.pytest.ini_options]
@@ -32,5 +33,5 @@ addopts = "-v --ignore=tests/transformator"
 module = ["untyped_package.*"]
 follow_untyped_imports = true
 
-[tool.setuptools]
-packages = ["app"]
+[tool.setuptools.package-data]
+"app" = ["**/*"]

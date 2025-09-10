@@ -5,7 +5,7 @@ from typing import Any
 import shutil
 import zipfile
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 
 import sippy
 
@@ -36,8 +36,9 @@ def get_jinja_template():
     """
     Gets the `templates/base.jinja` within the current package.
     """
+    templates_path = Path(__file__).parent / "templates"
     env = Environment(
-        loader=PackageLoader(__name__),
+        loader=FileSystemLoader(templates_path),
         autoescape=True,
     )
     return env.get_template("base.jinja")
