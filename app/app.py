@@ -80,6 +80,7 @@ class EventListener:
             self.log.error("Invalid event: subject is missing.")
             return
         self.log.info(f"Start handling of {unzipped_path}.")
+        zip_folder_path = Path(unzipped_path).parent
 
         event_data = event.get_data()
         event_data.pop("is_valid")
@@ -91,7 +92,7 @@ class EventListener:
 
         # Send event on topic
         data = {
-            "source": str(mh_sip_path),
+            "source": str(zip_folder_path),
             "host": self.config["host"],
             "paths": [
                 str(Path(f"{mh_sip_path}.zip")),
