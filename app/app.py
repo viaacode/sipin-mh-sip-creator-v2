@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import _pulsar
+
 from cloudevents.events import Event, PulsarBinding, EventOutcome, EventAttributes
 from viaa.configuration import ConfigParser
 from viaa.observability import logging
@@ -19,7 +21,7 @@ class EventListener:
     EventListener is responsible for listening to Pulsar events and processing them.
     """
 
-    def __init__(self):
+    def __init__(self, timeout_ms: int | None = None):
         """
         Initializes the EventListener with configuration, logging, and Pulsar client.
         """
@@ -27,8 +29,10 @@ class EventListener:
         self.config = config_parser.app_cfg
 
         self.log = logging.get_logger(__name__, config=config_parser)
-        self.pulsar_client = PulsarClient()
+        self.pulsar_client = PulsarClient(timeout_ms=timeout_ms)
         self.pid_client = PidClient()
+
+        self.running = True
 
     def produce_event(
         self,
@@ -120,15 +124,19 @@ class EventListener:
         """
         Starts listening for incoming messages from the Pulsar topic.
         """
-        while True:
-            msg = self.pulsar_client.receive()
+        while self.running:
             try:
-                event = PulsarBinding.from_protocol(msg)  # type: ignore
-                self.handle_incoming_message(event)
-                self.pulsar_client.acknowledge(msg)
-            except Exception as e:
-                # Catch and log any errors during message processing
-                self.log.error(f"Error: {e}")
-                self.pulsar_client.negative_acknowledge(msg)
+                msg = self.pulsar_client.receive()
+            except _pulsar.Timeout:
+                continue
+
+            # try:
+            event = PulsarBinding.from_protocol(msg)  # type: ignore
+            self.handle_incoming_message(event)
+            self.pulsar_client.acknowledge(msg)
+            # except Exception as e:
+            #     # Catch and log any errors during message processing
+            #     self.log.error(f"Error: {e}")
+            #     self.pulsar_client.negative_acknowledge(msg)
 
         self.pulsar_client.close()

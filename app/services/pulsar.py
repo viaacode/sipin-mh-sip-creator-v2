@@ -9,7 +9,7 @@ class PulsarClient:
     Abstraction for a Pulsar Client.
     """
 
-    def __init__(self):
+    def __init__(self, timeout_ms: int | None = None):
         """Initialize the PulsarClient with configurations and a consumer."""
         config_parser = ConfigParser()
         self.log = logging.get_logger(__name__, config=config_parser)
@@ -25,6 +25,7 @@ class PulsarClient:
             f"Started consuming topic: {self.pulsar_config['consumer_topic']}"
         )
         self.producers = {}
+        self.timeout_ms = timeout_ms
 
     def produce_event(self, topic: str, event: Event):
         """Produce a CloudEvent on a specified topic.
@@ -51,7 +52,7 @@ class PulsarClient:
         Returns:
             Message: The received message.
         """
-        return self.consumer.receive()
+        return self.consumer.receive(self.timeout_ms)
 
     def acknowledge(self, msg):
         """Acknowledge a message on the consumer.
