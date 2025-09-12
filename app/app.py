@@ -131,13 +131,13 @@ class EventListener:
             except _pulsar.Timeout:
                 continue
 
-            # try:
-            event = PulsarBinding.from_protocol(msg)  # type: ignore
-            self.handle_incoming_message(event)
-            self.pulsar_client.acknowledge(msg)
-            # except Exception as e:
-            #     # Catch and log any errors during message processing
-            #     self.log.error(f"Error: {e}")
-            #     self.pulsar_client.negative_acknowledge(msg)
+            try:
+                event = PulsarBinding.from_protocol(msg)  # type: ignore
+                self.handle_incoming_message(event)
+                self.pulsar_client.acknowledge(msg)
+            except Exception as e:
+                # Catch and log any errors during message processing
+                self.log.error(f"Error: {e}")
+                self.pulsar_client.negative_acknowledge(msg)
 
         self.pulsar_client.close()
