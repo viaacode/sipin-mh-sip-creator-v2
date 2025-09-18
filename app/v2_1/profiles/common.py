@@ -7,8 +7,6 @@ import sippy
 
 from ..langstrings import get_nl_string, get_nl_strings, get_optional_nl_string
 
-# TODO: ContentCategory (wachten op sip.py mapping van mets/@TYPE)
-
 
 def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
     ie = sip.entity
@@ -111,6 +109,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "qc_by": get_event_implementer(
                 sip, "https://data.hetarchief.be/id/event-type/quality-control"
             ),
+            "ContentCategory": sip.mets_type,
         },
     }
 

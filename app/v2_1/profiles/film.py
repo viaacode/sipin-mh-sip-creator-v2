@@ -22,7 +22,6 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "num_reels": get_number_of_reels(carrier_rep),
             #
             # Intellectual entity
-            # "ContentCategory": "image",  # TODO: which content category should this be?
             "type_viaa": sip.entity.format.value,
             "image_sound": get_image_sound(sip.entity),
             #

@@ -9,9 +9,7 @@ from . import helpers
 def get_mh_mapping(sip: SIP) -> dict[str, Any]:
     common_fields = common.get_mh_mapping(sip)
     basic_fields = {
-        "Dynamic": {
-            "ContentCategory": "image",  # TODO
-        },
+        "Dynamic": {},
     }
 
     return helpers.deepmerge(common_fields, basic_fields)
