@@ -148,11 +148,19 @@ def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
             ("multiselect", "BEZOEKERTOOL-METADATA-ALL"),
         ]
 
-    return [
+    concepts = [
         ("multiselect", get_nl_string(license.pref_label))
         for license in sip.entity.license
-        if isinstance(license, sippy.Concept)  # TODO: wat als dit geen concept is?
+        if isinstance(license, sippy.Concept)
     ]
+
+    uris = [
+        ("multiselect", license.id.split("/")[-1])
+        for license in sip.entity.license
+        if isinstance(license, sippy.URIRef)
+    ]
+
+    return concepts + uris
 
 
 def get_dc_identifier_localids(
