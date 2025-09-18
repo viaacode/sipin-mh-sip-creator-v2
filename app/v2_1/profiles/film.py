@@ -112,7 +112,7 @@ def get_preservation_problems(
 def get_color_or_bw(carrier: sippy.AnyPhysicalCarrier | None) -> list[str] | None:
     if not isinstance(carrier, sippy.ImageReel):
         return None
-    # TODO: translate coloring types
+    # TODO: should the coloring types be translated
     return [color.id.split("/")[-1] for color in carrier.coloring_type]
 
 

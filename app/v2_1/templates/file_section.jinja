@@ -6,8 +6,7 @@
     </mets:file>
     {%- endfor %}
 
-    {# TODO: Should this always be disk? #}
-    <mets:file ID="FILEID-METS" USE="Disk">
+    <mets:file ID="FILEID-METS" USE="{{ mets_archive_location }}">
       <mets:FLocat xlink:href="mets.xml" LOCTYPE="URL" />
     </mets:file>
   </mets:fileGrp>

@@ -111,7 +111,7 @@ def create_mh_mets_data(
         "ie": sip.entity,
         "events": events,
         "amdid": " ".join(event["mets_id"] for event in events),
-        "archive_location": archive_location,
+        "mets_archive_location": archive_location,
         "sidecar": sidecar,
     }
 
