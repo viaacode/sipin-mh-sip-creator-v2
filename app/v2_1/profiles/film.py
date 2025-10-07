@@ -12,7 +12,7 @@ from .common import get_nl_string
 
 def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
     carrier_rep = get_carrier_representation(sip.entity)
-    physical_carrier = get_physical_carrier(carrier_rep)
+    first_physical_carrier = get_first_physical_carrier(carrier_rep)
     common_fields = common.get_mh_mapping(sip)
 
     fields = {
@@ -22,38 +22,58 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "num_reels": get_number_of_reels(carrier_rep),
             #
             # Intellectual entity
-            # "ContentCategory": "image",  # TODO: which content category should this be?
             "type_viaa": sip.entity.format.value,
             "image_sound": get_image_sound(sip.entity),
             #
             # Physical carrier
-            "preservation_problems": get_preservation_problems(physical_carrier),
-            "film_base": physical_carrier.material,
+            "preservation_problems": get_preservation_problems(first_physical_carrier),
+            "film_base": get_film_base(first_physical_carrier),
             # "dc_description_cast": hascastmember # TODO
-            "subtitles": get_subtitles(physical_carrier),
-            "language_subtitles": get_language_subtitles(physical_carrier),
-            "original_location": physical_carrier.file_path,
-            "format": get_medium(physical_carrier),
-            "carrier_barcode": physical_carrier.identifier,
+            "subtitles": get_subtitles(first_physical_carrier),
+            "language_subtitles": get_language_subtitles(first_physical_carrier),
+            "original_location": get_original_location(first_physical_carrier),
+            "format": get_medium(first_physical_carrier),
+            "carrier_barcode": get_carrier_barcode(first_physical_carrier),
             "original_carrier_id": common.get_dc_identifier_localid(sip.entity),
             "date": sip.entity.date_created.value,
             #
             # Image and audio reels
-            "gauge": get_medium(physical_carrier),
-            "material_type": get_material_type(physical_carrier),
-            "aspect_ratio": get_aspect_ratio(physical_carrier),
-            "brand_of_film_stock": get_brand_of_film_stock(physical_carrier),
+            "gauge": get_medium(first_physical_carrier),
+            "material_type": get_material_type(first_physical_carrier),
+            "aspect_ratio": get_aspect_ratio(first_physical_carrier),
+            "brand_of_film_stock": get_brand_of_film_stock(first_physical_carrier),
             #
             # Image Reel
-            "color_or_bw": get_color_or_bw(physical_carrier),
-            # "barcode_image_reels": "" # TODO: bestaat dit veld?
-            "batch_pickup_date": common.get_event_date(  # TODO: wat is de correcte spelling van dit veld?
+            "color_or_bw": get_color_or_bw(first_physical_carrier),
+            "barcode_image_reels": get_barcode_image_reels(carrier_rep),
+            "barcode_sound_reels": get_barcode_audio_reels(carrier_rep),
+            "batch_pickup_date": common.get_event_date(
                 sip, "https://data.hetarchief.be/id/event-type/check-out"
             ),
         },
     }
 
     return helpers.deepmerge(fields, common_fields)
+
+
+def get_original_location(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
+    if carrier is None:
+        return None
+
+    return carrier.file_path
+
+
+def get_carrier_barcode(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
+    if carrier is None:
+        return None
+
+    return carrier.identifier
+
+
+def get_film_base(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
+    if carrier is None:
+        return carrier
+    return carrier.material
 
 
 def get_carrier_representation(
@@ -69,14 +89,10 @@ def get_carrier_representation(
     return carrier_reps[0]
 
 
-def get_physical_carrier(
+def get_first_physical_carrier(
     carrier_rep: sippy.CarrierRepresentation,
-) -> sippy.AnyPhysicalCarrier:
-    if len(carrier_rep.stored_at) != 1:
-        raise ValueError(
-            "The Mediahaven METS only has space for the metadata of one physical carrier or reel."
-        )
-    return carrier_rep.stored_at[0]
+) -> sippy.AnyPhysicalCarrier | None:
+    return next(iter(carrier_rep.stored_at), None)
 
 
 def get_number_of_reels(rep: sippy.CarrierRepresentation) -> int | None:
@@ -84,16 +100,19 @@ def get_number_of_reels(rep: sippy.CarrierRepresentation) -> int | None:
 
 
 def get_preservation_problems(
-    carrier: sippy.AnyPhysicalCarrier,
+    carrier: sippy.AnyPhysicalCarrier | None,
 ) -> list[tuple[str, str]] | None:
+    if carrier is None:
+        return None
+
     problems = [get_nl_string(prob.pref_label) for prob in carrier.preservation_problem]
     return [("multiselect", problem) for problem in problems]
 
 
-def get_color_or_bw(carrier: sippy.AnyPhysicalCarrier) -> list[str] | None:
+def get_color_or_bw(carrier: sippy.AnyPhysicalCarrier | None) -> list[str] | None:
     if not isinstance(carrier, sippy.ImageReel):
         return None
-    # TODO: translate coloring types
+    # TODO: should the coloring types be translated
     return [color.id.split("/")[-1] for color in carrier.coloring_type]
 
 
@@ -125,25 +144,25 @@ def get_image_sound(entity: sippy.IntellectualEntity) -> ImageSound:
     raise ValueError()
 
 
-def get_material_type(carrier: sippy.AnyPhysicalCarrier) -> str | None:
+def get_material_type(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
     if not isinstance(carrier, (sippy.ImageReel, sippy.AudioReel)):
         return None
     return carrier.stock_type
 
 
-def get_aspect_ratio(carrier: sippy.AnyPhysicalCarrier) -> str | None:
+def get_aspect_ratio(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
     if not isinstance(carrier, (sippy.ImageReel, sippy.AudioReel)):
         return None
     return carrier.aspect_ratio
 
 
-def get_medium(carrier: sippy.AnyPhysicalCarrier) -> str | None:
+def get_medium(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
     if not isinstance(carrier, (sippy.ImageReel, sippy.AudioReel)):
         return None
     return carrier.storage_medium.id.split("/")[-1]
 
 
-def get_brand_of_film_stock(carrier: sippy.AnyPhysicalCarrier) -> str | None:
+def get_brand_of_film_stock(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
     if not isinstance(carrier, (sippy.ImageReel, sippy.AudioReel)):
         return None
     if carrier.brand is None:
@@ -151,7 +170,9 @@ def get_brand_of_film_stock(carrier: sippy.AnyPhysicalCarrier) -> str | None:
     return get_nl_string(carrier.brand.name)
 
 
-def get_subtitles(carrier: sippy.AnyPhysicalCarrier) -> Literal["Yes", "No"] | None:
+def get_subtitles(
+    carrier: sippy.AnyPhysicalCarrier | None,
+) -> Literal["Yes", "No"] | None:
     if not isinstance(carrier, sippy.ImageReel):
         return None
     if len(carrier.has_captioning) == 0:
@@ -160,7 +181,7 @@ def get_subtitles(carrier: sippy.AnyPhysicalCarrier) -> Literal["Yes", "No"] | N
 
 
 def get_language_subtitles(
-    carrier: sippy.AnyPhysicalCarrier,
+    carrier: sippy.AnyPhysicalCarrier | None,
 ) -> list[tuple[str, str]] | None:
     if not isinstance(carrier, sippy.ImageReel):
         return None
@@ -169,3 +190,19 @@ def get_language_subtitles(
         captions.in_language for captions in carrier.has_captioning
     )
     return [("multiselect", lang) for lang in langs]
+
+
+def get_barcode_image_reels(carrier: sippy.CarrierRepresentation) -> str:
+    image_reels = [
+        reel for reel in carrier.stored_at if isinstance(reel, sippy.ImageReel)
+    ]
+    ids = [reel.identifier for reel in image_reels]
+    return " | ".join(ids)
+
+
+def get_barcode_audio_reels(carrier: sippy.CarrierRepresentation) -> str:
+    image_reels = [
+        reel for reel in carrier.stored_at if isinstance(reel, sippy.AudioReel)
+    ]
+    ids = [reel.identifier for reel in image_reels]
+    return " | ".join(ids)

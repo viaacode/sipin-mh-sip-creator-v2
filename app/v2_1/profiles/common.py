@@ -7,8 +7,6 @@ import sippy
 
 from ..langstrings import get_nl_string, get_nl_strings, get_optional_nl_string
 
-# TODO: ContentCategory (wachten op sip.py mapping van mets/@TYPE)
-
 
 def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
     ie = sip.entity
@@ -111,6 +109,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "qc_by": get_event_implementer(
                 sip, "https://data.hetarchief.be/id/event-type/quality-control"
             ),
+            "ContentCategory": sip.mets_type,
         },
     }
 
@@ -149,11 +148,19 @@ def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
             ("multiselect", "BEZOEKERTOOL-METADATA-ALL"),
         ]
 
-    return [
+    concepts = [
         ("multiselect", get_nl_string(license.pref_label))
         for license in sip.entity.license
-        if isinstance(license, sippy.Concept)  # TODO: wat als dit geen concept is?
+        if isinstance(license, sippy.Concept)
     ]
+
+    uris = [
+        ("multiselect", license.id.split("/")[-1])
+        for license in sip.entity.license
+        if isinstance(license, sippy.URIRef)
+    ]
+
+    return concepts + uris
 
 
 def get_dc_identifier_localids(
