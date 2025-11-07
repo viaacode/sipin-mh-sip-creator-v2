@@ -41,12 +41,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "dc_rights_credit": get_optional_nl_string(ie.credit_text),
             "dc_rights_comment": get_optional_nl_string(ie.rights),
             "dc_rights_licenses": get_licenses(sip),
-            "dimensions": [
-                ("width_in_mm", quantitive_value_to_millimetres(ie.width)),
-                ("height_in_mm", quantitive_value_to_millimetres(ie.height)),
-                ("depth_in_mm", quantitive_value_to_millimetres(ie.depth)),
-                ("weight_in_kg", quantitive_value_to_millimetres(ie.weight)),
-            ],
+            "dimensions": get_dimensions(ie),
             #
             # Premis events
             "inspection_date": get_event_date(
@@ -116,9 +111,11 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
     return mapping
 
 
-def quantitive_value_to_millimetres(dimension: sippy.QuantitativeValue | None) -> str:
+def quantitive_value_to_millimetres(
+    dimension: sippy.QuantitativeValue | None,
+) -> str | None:
     if dimension is None:
-        return "0"
+        return None
 
     unit = dimension.unit_code
     value = dimension.value.value
@@ -133,7 +130,18 @@ def quantitive_value_to_millimetres(dimension: sippy.QuantitativeValue | None) -
     if unit == "KGM":
         return str(value)
 
-    return "0"
+    return None
+
+
+def get_dimensions(ie: sippy.IntellectualEntity) -> list[tuple[str, str]]:
+    dimensions = [
+        ("width_in_mm", quantitive_value_to_millimetres(ie.width)),
+        ("height_in_mm", quantitive_value_to_millimetres(ie.height)),
+        ("depth_in_mm", quantitive_value_to_millimetres(ie.depth)),
+        ("weight_in_kg", quantitive_value_to_millimetres(ie.weight)),
+    ]
+
+    return [dim for dim in dimensions if dim[1] is not None]
 
 
 def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
