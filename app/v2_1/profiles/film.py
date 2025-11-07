@@ -109,11 +109,22 @@ def get_preservation_problems(
     return [("multiselect", problem) for problem in problems]
 
 
-def get_color_or_bw(carrier: sippy.AnyPhysicalCarrier | None) -> list[str] | None:
+def get_color_or_bw(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
     if not isinstance(carrier, sippy.ImageReel):
         return None
-    # TODO: should the coloring types be translated
-    return [color.id.split("/")[-1] for color in carrier.coloring_type]
+    coloring_types = [color.id.split("/")[-1] for color in carrier.coloring_type]
+    coloring_types = sorted(coloring_types)
+    match coloring_types:
+        case ["BandW"]:
+            return "Zwart/wit"
+        case ["Color"]:
+            return "Kleur"
+        case ["BandW", "Color"]:
+            return "Zwart/wit En Kleur"
+        case ["UnknownColorType"]:
+            return "Andere"
+
+    return None
 
 
 ImageSound = Literal[
