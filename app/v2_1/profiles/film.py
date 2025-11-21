@@ -28,7 +28,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             # Physical carrier
             "preservation_problems": get_preservation_problems(first_physical_carrier),
             "film_base": get_film_base(first_physical_carrier),
-            # "dc_description_cast": hascastmember # TODO
+            "dc_description_cast": get_cast(sip.entity),
             "subtitles": get_subtitles(first_physical_carrier),
             "language_subtitles": get_language_subtitles(first_physical_carrier),
             "original_location": get_original_location(first_physical_carrier),
@@ -217,3 +217,7 @@ def get_barcode_audio_reels(carrier: sippy.CarrierRepresentation) -> str:
     ]
     ids = [reel.identifier for reel in image_reels]
     return " | ".join(ids)
+
+
+def get_cast(entity: sippy.IntellectualEntity) -> str | None:
+    return entity.castmembers
