@@ -315,6 +315,11 @@ def get_event_implementer(sip: sippy.SIP, event_type: sippy.EventClass) -> str |
 
 def get_dc_titles(ie: sippy.IntellectualEntity) -> list[tuple[str, str]]:
     titles: list[tuple[str, str]] = []
+
+    if ie.alternative_name:
+        alternative = get_nl_string(ie.alternative_name)
+        titles.append(("alternatief", alternative))
+
     for item in ie.schema_is_part_of:
         match item:
             case sippy.BroadcastEvent():
