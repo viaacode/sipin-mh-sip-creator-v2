@@ -109,6 +109,11 @@ def create_mh_mets_data(
         "pid": pid,
         "files": files,
         "ie": sip.entity,
+        "dc_title": get_nl_string(sip.entity.name),
+        "cp": get_nl_string(sip.entity.maintainer.pref_label),
+        "cp_id": sip.entity.maintainer.identifier,
+        "sp_name": "sipin",
+        "sp_id": get_service_provider_id(sip),
         "events": events,
         "amdid": " ".join(event["mets_id"] for event in events),
         "mets_archive_location": archive_location,
@@ -273,3 +278,19 @@ def get_event_objects(event: sippy.Event) -> list[dict[str, str]]:
         ]
 
     return total
+
+
+def get_service_provider_id(sip: sippy.SIP) -> str:
+    sp_agent = next(
+        agent
+        for agent in sip.mets_agents
+        if agent.type == "ORGANIZATION" and agent.role == "CREATOR"
+    )
+
+    if not isinstance(sp_agent.note, dict):
+        raise Exception(
+            "The note on the METS creator (service provider) should be of type EARKNote."
+        )
+
+    note = sippy.EARKNote(**sp_agent.note)
+    return note.value
