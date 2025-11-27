@@ -31,10 +31,12 @@
           <{{ tag }}>{{ sidecar["Dynamic"][tag] }}</{{ tag }}>
             {%- endif %}
           {%- endfor %}
-          <dc_title>{{ ie.name.nl }}</dc_title>
+          <dc_title>{{ dc_title }}</dc_title>
           <PID>{{ pid }}</PID>
-          <CP_id>{{ie.maintainer.identifier}}</CP_id>
-          <sp_name>sipin</sp_name>
+          <CP>{{ cp }}</CP>
+          <CP_id>{{ cp_id }}</CP_id>
+          <sp_name>{{ sp_name }}</sp_name>
+          <sp_id>{{ sp_id }}</sp_id>
         </mhs:Dynamic>
       </mhs:Sidecar>
     </mets:xmlData>
