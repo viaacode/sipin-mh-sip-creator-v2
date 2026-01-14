@@ -135,8 +135,15 @@ ImageSound = Literal[
 ]
 
 
-def get_image_sound(entity: sippy.IntellectualEntity) -> ImageSound:
+def get_image_sound(entity: sippy.IntellectualEntity) -> ImageSound | None:
     carrier_rep = get_carrier_representation(entity)
+
+    if entity.type not in (
+        sippy.EntityClass.film,
+        sippy.EntityClass.sound_film,
+        sippy.EntityClass.silent_film,
+    ):
+        return None
 
     is_sound_film = entity.type == sippy.EntityClass.sound_film
     is_silent_film = entity.type == sippy.EntityClass.silent_film
