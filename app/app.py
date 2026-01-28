@@ -89,6 +89,13 @@ class EventListener:
 
         write_mediahaven_sip_fn = get_sip_creator(sip)
         mh_sip_path, mets_xml = write_mediahaven_sip_fn(sip, self.config, pid)
+        profile = str(sip.profile).split("/")[-1]
+
+        # Cursed knowlegde:
+        # A meemoo VIDEO SIP with profile "film"
+        # should receive the "Basic" record type in mediahaven
+        if sip.entity.type == sippy.EntityClass.video:
+            profile = "basic"
 
         # Send event on topic
         data = {
@@ -99,7 +106,7 @@ class EventListener:
             ],
             "cp_id": sip.entity.maintainer.identifier,
             "type": "complex",
-            "sip_profile": str(sip.profile).split("/")[-1],
+            "sip_profile": profile,
             "pid": pid,
             "outcome": EventOutcome.SUCCESS,
             "metadata": mets_xml,

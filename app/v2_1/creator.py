@@ -100,6 +100,11 @@ def create_mh_mets_data(
 
     sidecar = create_mh_sidecar_data(sip)
 
+    # A meemoo VIDEO SIP with profile "film"
+    # should receive the "Basic" record type in mediahaven
+    if sip.entity.type == sippy.EntityClass.video:
+        profile = "basic"
+
     events = [transform_event(event) for event in sip.events]
 
     return {
