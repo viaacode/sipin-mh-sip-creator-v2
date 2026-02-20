@@ -32,13 +32,14 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "subtitles": get_subtitles(first_physical_carrier),
             "language_subtitles": get_language_subtitles(first_physical_carrier),
             "original_location": get_original_location(first_physical_carrier),
-            "format": get_medium(first_physical_carrier),
+            "format": get_format(first_physical_carrier),
+            "format_version": get_format_version(first_physical_carrier),
             "carrier_barcode": get_carrier_barcode(first_physical_carrier),
             "original_carrier_id": common.get_dc_identifier_localid(sip.entity),
             "date": sip.entity.date_created.value,
             #
             # Image and audio reels
-            "gauge": get_medium(first_physical_carrier),
+            "gauge": get_format_version(first_physical_carrier),
             "material_type": get_material_type(first_physical_carrier),
             "aspect_ratio": get_aspect_ratio(first_physical_carrier),
             "brand_of_film_stock": get_brand_of_film_stock(first_physical_carrier),
@@ -177,10 +178,20 @@ def get_aspect_ratio(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
     return carrier.aspect_ratio
 
 
-def get_medium(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
-    if not isinstance(carrier, (sippy.ImageReel, sippy.AudioReel)):
+def get_format_version(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
+    if carrier is None:
         return None
     return carrier.storage_medium.id.split("/")[-1]
+
+
+def get_format(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
+    format_version = get_format_version(carrier)
+
+    vhs_formats = ("d-vhs", "s-vhs", "s-vhs-c", "vhs", "vhs-c", "w-vhs")
+    if format_version in vhs_formats:
+        return "vhs"
+
+    return None
 
 
 def get_brand_of_film_stock(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
