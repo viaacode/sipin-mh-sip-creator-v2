@@ -52,6 +52,7 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "dc_rights_comment": get_optional_nl_string(ie.rights),
             "dc_rights_licenses": get_licenses(sip),
             "dimensions": get_dimensions(ie),
+            "created_on": get_event_date(sip, registration_event_id),
             #
             # Premis events
             "inspection_date": get_event_date(sip, inspection_event_id),
