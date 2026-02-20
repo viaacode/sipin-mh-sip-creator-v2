@@ -50,6 +50,9 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "batch_pickup_date": common.get_event_date(
                 sip, "https://data.hetarchief.be/id/event-type/check-out"
             ),
+            #
+            # Video
+            "brand": get_brand(first_physical_carrier),
         },
     }
 
@@ -182,6 +185,15 @@ def get_medium(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
 
 def get_brand_of_film_stock(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
     if not isinstance(carrier, (sippy.ImageReel, sippy.AudioReel)):
+        return None
+    if carrier.brand is None:
+        return None
+    return get_nl_string(carrier.brand.name)
+
+
+def get_brand(carrier: sippy.AnyPhysicalCarrier | None) -> str | None:
+    # brand is only for video (which uses hasip:physicalCarrier), brand_of_film_stock is for film
+    if not isinstance(carrier, sippy.PhysicalCarrier):
         return None
     if carrier.brand is None:
         return None
