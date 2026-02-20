@@ -112,7 +112,7 @@ def get_dimensions(ie: sippy.IntellectualEntity) -> list[tuple[str, str]]:
         ("weight_in_kg", quantitive_value_to_millimetres(ie.weight)),
     ]
 
-    return [dim for dim in dimensions if dim[1] is not None]
+    return [dim for dim in dimensions if dim[1] is not None]  # pyright: ignore[reportReturnType]
 
 
 def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
