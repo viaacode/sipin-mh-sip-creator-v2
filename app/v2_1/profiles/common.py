@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Final
 from urllib.parse import urlparse
 from pathlib import Path
 from datetime import datetime
@@ -6,6 +6,16 @@ from datetime import datetime
 import sippy
 
 from ..langstrings import get_nl_string, get_nl_strings, get_optional_nl_string
+
+registration_event_id: Final = "https://data.hetarchief.be/id/event-type/registration"
+inspection_event_id: Final = "https://data.hetarchief.be/id/event-type/inspection"
+repair_event_id: Final = "https://data.hetarchief.be/id/event-type/repair"
+cleaning_event_id: Final = "https://data.hetarchief.be/id/event-type/cleaning"
+baking_event_id: Final = "https://data.hetarchief.be/id/event-type/baking"
+digitization_event_id: Final = "https://data.hetarchief.be/id/event-type/digitization"
+quality_control_event_id: Final = (
+    "https://data.hetarchief.be/id/event-type/quality-control"
+)
 
 
 def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
@@ -42,68 +52,29 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "dc_rights_comment": get_optional_nl_string(ie.rights),
             "dc_rights_licenses": get_licenses(sip),
             "dimensions": get_dimensions(ie),
+            "created_on": get_event_date(sip, registration_event_id),
             #
             # Premis events
-            "inspection_date": get_event_date(
-                sip, "https://data.hetarchief.be/id/event-type/inspection"
-            ),
-            "inspection_outcome": get_event_outcome(
-                sip, "https://data.hetarchief.be/id/event-type/inspection"
-            ),
-            "inspection_note": get_event_note(
-                sip, "https://data.hetarchief.be/id/event-type/inspection"
-            ),
-            "repair_date": get_event_date(
-                sip, "https://data.hetarchief.be/id/event-type/repair"
-            ),
-            "repair_outcome": get_event_outcome(
-                sip, "https://data.hetarchief.be/id/event-type/repair"
-            ),
-            "repair_note": get_event_note(
-                sip, "https://data.hetarchief.be/id/event-type/repair"
-            ),
-            "cleaning_date": get_event_date(
-                sip, "https://data.hetarchief.be/id/event-type/cleaning"
-            ),
-            "cleaning_outcome": get_event_outcome(
-                sip, "https://data.hetarchief.be/id/event-type/cleaning"
-            ),
-            "cleaning_note": get_event_note(
-                sip, "https://data.hetarchief.be/id/event-type/cleaning"
-            ),
-            "baking_date": get_event_date(
-                sip, "https://data.hetarchief.be/id/event-type/baking"
-            ),
-            "baking_outcome": get_event_outcome(
-                sip, "https://data.hetarchief.be/id/event-type/baking"
-            ),
-            "baking_note": get_event_note(
-                sip, "https://data.hetarchief.be/id/event-type/baking"
-            ),
-            "digitization_date": get_event_date(
-                sip, "https://data.hetarchief.be/id/event-type/digitization"
-            ),
-            "digitization_time": get_event_time(
-                sip, "https://data.hetarchief.be/id/event-type/digitization"
-            ),
-            "digitization_outcome": get_event_outcome(
-                sip, "https://data.hetarchief.be/id/event-type/digitization"
-            ),
-            "digitization_note": get_event_note(
-                sip, "https://data.hetarchief.be/id/event-type/digitization"
-            ),
-            "qc_date": get_event_date(
-                sip, "https://data.hetarchief.be/id/event-type/quality-control"
-            ),
-            "qc_outcome": get_event_outcome(
-                sip, "https://data.hetarchief.be/id/event-type/quality-control"
-            ),
-            "qc_note": get_event_note(
-                sip, "https://data.hetarchief.be/id/event-type/quality-control"
-            ),
-            "qc_by": get_event_implementer(
-                sip, "https://data.hetarchief.be/id/event-type/quality-control"
-            ),
+            "inspection_date": get_event_date(sip, inspection_event_id),
+            "inspection_outcome": get_event_outcome(sip, inspection_event_id),
+            "inspection_note": get_event_note(sip, inspection_event_id),
+            "repair_date": get_event_date(sip, repair_event_id),
+            "repair_outcome": get_event_outcome(sip, repair_event_id),
+            "repair_note": get_event_note(sip, repair_event_id),
+            "cleaning_date": get_event_date(sip, cleaning_event_id),
+            "cleaning_outcome": get_event_outcome(sip, cleaning_event_id),
+            "cleaning_note": get_event_note(sip, cleaning_event_id),
+            "baking_date": get_event_date(sip, baking_event_id),
+            "baking_outcome": get_event_outcome(sip, baking_event_id),
+            "baking_note": get_event_note(sip, baking_event_id),
+            "digitization_date": get_event_date(sip, digitization_event_id),
+            "digitization_time": get_event_time(sip, digitization_event_id),
+            "digitization_outcome": get_event_outcome(sip, digitization_event_id),
+            "digitization_note": get_event_note(sip, digitization_event_id),
+            "qc_date": get_event_date(sip, quality_control_event_id),
+            "qc_outcome": get_event_outcome(sip, quality_control_event_id),
+            "qc_note": get_event_note(sip, quality_control_event_id),
+            "qc_by": get_event_implementer(sip, quality_control_event_id),
             "ContentCategory": sip.mets_type,
         },
     }
@@ -141,7 +112,7 @@ def get_dimensions(ie: sippy.IntellectualEntity) -> list[tuple[str, str]]:
         ("weight_in_kg", quantitive_value_to_millimetres(ie.weight)),
     ]
 
-    return [dim for dim in dimensions if dim[1] is not None]
+    return [dim for dim in dimensions if dim[1] is not None]  # pyright: ignore[reportReturnType]
 
 
 def get_licenses(sip: sippy.SIP) -> list[tuple[str, str]]:
