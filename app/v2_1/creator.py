@@ -47,7 +47,7 @@ def get_jinja_template():
 def create_mh_mets_data(
     sip: sippy.SIP,
     pid: str,
-    archive_location: Literal["Disk", "Tape"],
+    essence_archive_location: Literal["Disk", "Tape"],
     mh_sidecar_version: str,
 ) -> dict[str, Any]:
     """
@@ -77,6 +77,12 @@ def create_mh_mets_data(
 
             file_path = Path(file.stored_at.file_path)
             file_name = file_path.name
+
+            archive_location = (
+                "Disk"
+                if is_film_collateral(profile, file)
+                else essence_archive_location
+            )
 
             files.append(
                 {
@@ -121,9 +127,20 @@ def create_mh_mets_data(
         "sp_id": get_service_provider_id(sip),
         "events": events,
         "amdid": " ".join(event["mets_id"] for event in events),
-        "mets_archive_location": archive_location,
+        "mets_archive_location": essence_archive_location,
         "sidecar": sidecar,
     }
+
+
+def is_film_collateral(profile: str, file: sippy.File):
+    # altought this field is optional in the KG datamodels (and sippy),
+    # the sipin transformator always copies this value over from the SIP
+    if file.original_name is None:
+        return False
+
+    # file original name contains the file extension, as per the SIP spec
+    ext = Path(file.original_name).suffix
+    return profile == "film" and ext.lower() in (".jpg", ".jpeg", ".pdf")
 
 
 def write_mediahaven_sip(
@@ -131,8 +148,10 @@ def write_mediahaven_sip(
 ) -> tuple[Path, str]:
     mh_sidecar_version = config["mh_sidecar_version"]
     aip_folder = config["aip_folder"]
-    archive_location = determine_archive_location(sip, config)
-    mets_data = create_mh_mets_data(sip, pid, archive_location, mh_sidecar_version)
+    essence_archive_location = determine_archive_location(sip, config)
+    mets_data = create_mh_mets_data(
+        sip, pid, essence_archive_location, mh_sidecar_version
+    )
 
     template = get_jinja_template()
     mets_xml = template.render(mets_data)
