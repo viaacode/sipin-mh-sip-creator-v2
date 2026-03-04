@@ -94,9 +94,9 @@ def quantitive_value_to_millimetres(
     if unit == "MMT":
         return str(round(value))
     if unit == "CMT":
-        return str(round(value / 10))
+        return str(round(value * 10))
     if unit == "MTR":
-        return str(round(value / 1000))
+        return str(round(value * 1000))
 
     if unit == "KGM":
         return str(value)
