@@ -79,9 +79,7 @@ def create_mh_mets_data(
             file_name = file_path.name
 
             archive_location = (
-                "Disk"
-                if is_film_collateral(profile, file)
-                else essence_archive_location
+                "Disk" if is_collateral(profile, file) else essence_archive_location
             )
 
             files.append(
@@ -132,7 +130,7 @@ def create_mh_mets_data(
     }
 
 
-def is_film_collateral(profile: str, file: sippy.File):
+def is_collateral(profile: str, file: sippy.File):
     # altought this field is optional in the KG datamodels (and sippy),
     # the sipin transformator always copies this value over from the SIP
     if file.original_name is None:
@@ -140,7 +138,12 @@ def is_film_collateral(profile: str, file: sippy.File):
 
     # file original name contains the file extension, as per the SIP spec
     ext = Path(file.original_name).suffix
-    return profile == "film" and ext.lower() in (".jpg", ".jpeg", ".pdf")
+
+    is_film_collateral = profile == "film" and ext.lower() in (".jpg", ".jpeg", ".pdf")
+    is_basic_collateral = profile == "basic" and ext.lower() in (".srt",)
+    is_any_collateral = ext.lower() in (".xml",)
+
+    return is_film_collateral or is_basic_collateral or is_any_collateral
 
 
 def write_mediahaven_sip(
