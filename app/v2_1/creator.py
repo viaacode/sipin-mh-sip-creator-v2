@@ -130,7 +130,7 @@ def create_mh_mets_data(
     }
 
 
-def is_collateral(profile: str, file: sippy.File):
+def is_collateral(profile: str, file: sippy.File) -> bool:
     # altought this field is optional in the KG datamodels (and sippy),
     # the sipin transformator always copies this value over from the SIP
     if file.original_name is None:
