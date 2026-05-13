@@ -29,7 +29,6 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
         "Dynamic": {
             "dc_title": get_nl_string(ie.name),
             "dc_description": get_optional_nl_string(ie.description),
-            "dc_description_lang": get_optional_nl_string(ie.description),
             "dcterms_created": ie.date_created.value,
             "dcterms_issued": ie.date_published.value if ie.date_published else None,
             "dc_rights_rightsOwners": [
