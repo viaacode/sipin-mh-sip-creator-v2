@@ -270,13 +270,6 @@ def get_event_note(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
     return event.note
 
 
-def get_quality_control_by(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
-    event = get_event_with_type(sip, event_type)
-    if event is None:
-        return None
-    return get_nl_string(event.implemented_by.name)
-
-
 def get_event_implementer(sip: sippy.SIP, event_type: sippy.EventClass) -> str | None:
     event = get_event_with_type(sip, event_type)
     if event is None:

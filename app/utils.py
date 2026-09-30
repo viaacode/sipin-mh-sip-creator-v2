@@ -12,9 +12,6 @@ from .mediahaven_sip import (
 from .profile_url import parse_profile_url
 
 
-class MediaHavenCreatorError(Exception): ...
-
-
 def get_mets_creator(sip: sippy.SIP):
     _, version = parse_profile_url(sip)
 

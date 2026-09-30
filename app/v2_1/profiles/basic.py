@@ -12,4 +12,4 @@ def get_mh_mapping(sip: SIP) -> dict[str, Any]:
         "Dynamic": {},
     }
 
-    return helpers.deepmerge(common_fields, basic_fields)
+    return helpers.deepmerge(basic_fields, common_fields)
