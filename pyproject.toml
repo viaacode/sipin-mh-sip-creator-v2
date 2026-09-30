@@ -26,9 +26,28 @@ dev = [
     "testcontainers==4.10.0",
 ]
 
+[dependency-groups]
+# uv installs this group by default. The transformator is not published, so it
+# comes from the pinned submodule; pip users install it by hand.
+dev = [
+    "sipin-mh-sip-creator-v2[dev]",
+    "sipin-meemoo-sip-2-transformator",
+]
+
+[tool.uv]
+allow-insecure-host = ["do-prd-mvn-01.do.viaa.be"]
+
+[tool.uv.sources]
+sipin-meemoo-sip-2-transformator = { path = "tests/transformator", editable = true }
+
+[[tool.uv.index]]
+name = "meemoo"
+url = "http://do-prd-mvn-01.do.viaa.be:8081/repository/pypi-all/simple"
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-v --ignore=tests/transformator"
+pythonpath = ["."]
 
 [[tool.mypy.overrides]]
 module = ["untyped_package.*"]
