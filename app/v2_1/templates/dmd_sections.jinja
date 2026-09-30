@@ -1,4 +1,4 @@
-<mets:dmdSec ID="DMDID-{{ profile.upper()}}" CREATED="{{ createdate }}" STATUS="original">
+<mets:dmdSec ID="DMDID-{{ record_type.upper()}}" CREATED="{{ createdate }}" STATUS="original">
   <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
     <mets:xmlData>
       <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mhs/"
@@ -42,7 +42,7 @@
     </mets:xmlData>
   </mets:mdWrap>
 </mets:dmdSec>
-<mets:dmdSec ID="DMDID-{{ profile.upper()}}-METS" CREATED="2023-11-20T21:44:28" STATUS="original">
+<mets:dmdSec ID="DMDID-{{ record_type.upper()}}-METS" CREATED="2023-11-20T21:44:28" STATUS="original">
   <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="mhs:Sidecar">
     <mets:xmlData>
       <mhs:Sidecar xmlns:mhs="https://zeticon.mediahaven.com/metadata/{{ mh_sidecar_version }}/mhs/"

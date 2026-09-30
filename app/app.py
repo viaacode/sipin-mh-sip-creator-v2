@@ -8,7 +8,6 @@ from viaa.observability import logging
 
 from app.services.pulsar import PulsarClient
 from app.services.pid import PidClient
-from app.profile_url import parse_profile_url
 from app.utils import get_sip_creator
 
 import sippy
@@ -89,28 +88,22 @@ class EventListener:
         pid = self.get_pid(sip)
 
         write_mediahaven_sip_fn = get_sip_creator(sip)
-        mh_sip_path, mets_xml = write_mediahaven_sip_fn(sip, self.config, pid)
-        profile, _ = parse_profile_url(sip)
-
-        # Cursed knowlegde:
-        # A meemoo VIDEO SIP with profile "film"
-        # should receive the "Basic" record type in mediahaven
-        if sip.entity.type == sippy.EntityClass.video:
-            profile = "basic"
+        mh_sip = write_mediahaven_sip_fn(sip, self.config, pid)
 
         # Send event on topic
         data = {
             "source": str(zip_folder_path),
             "host": self.config["host"],
             "paths": [
-                str(Path(f"{mh_sip_path}.zip")),
+                str(Path(f"{mh_sip.path}.zip")),
             ],
             "cp_id": sip.entity.maintainer.identifier,
             "type": "complex",
-            "sip_profile": profile,
+            # Despite the name, this is the MediaHaven record type
+            "sip_profile": mh_sip.record_type,
             "pid": pid,
             "outcome": EventOutcome.SUCCESS,
-            "metadata": mets_xml,
+            "metadata": mh_sip.mets_xml,
             "message": f"AIP created: MH2.0 complex created for {unzipped_path}",
         }
         producer_topic = self.config["pulsar"]["producer_topic"]

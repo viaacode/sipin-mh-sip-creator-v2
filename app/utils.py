@@ -1,6 +1,5 @@
 from typing import Any
 from collections.abc import Callable
-from pathlib import Path
 
 import sippy
 
@@ -25,7 +24,7 @@ def get_mets_creator(sip: sippy.SIP):
 
 def get_sip_creator(
     sip: sippy.SIP,
-) -> Callable[[sippy.SIP, dict[str, Any], str], tuple[Path, str]]:
+) -> Callable[[sippy.SIP, dict[str, Any], str], v2_1.MediaHavenSip]:
     _, version = parse_profile_url(sip)
 
     match version:

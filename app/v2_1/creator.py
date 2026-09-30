@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Literal, NamedTuple
 from typing import Any
 import shutil
 import zipfile
@@ -13,6 +13,22 @@ from app.profile_url import parse_profile_url
 from app.v2_1.langstrings import get_nl_string
 
 from . import profiles
+
+
+class MediaHavenSip(NamedTuple):
+    path: Path
+    mets_xml: str
+    record_type: str
+
+
+def mh_entity_record_type(sip: sippy.SIP) -> str:
+    """
+    Mapping of the SIP profile to the mediahaven classification and record type
+    """
+    if sip.entity.type == sippy.EntityClass.video:
+        return "basic"
+    profile, _ = parse_profile_url(sip)
+    return profile
 
 
 def create_mh_sidecar_data(sip: sippy.SIP) -> dict:
@@ -53,7 +69,10 @@ def create_mh_mets_data(
     Create the data needed to render a METS XML file.
     """
 
-    profile, _ = parse_profile_url(sip)
+    # File IDs, collateral rules and the sidecar mapping follow the SIP profile;
+    # the IE's DMD section and struct map follow the MediaHaven record type.
+    sip_profile, _ = parse_profile_url(sip)
+    record_type = mh_entity_record_type(sip)
 
     files = []
 
@@ -78,14 +97,14 @@ def create_mh_mets_data(
             file_name = file_path.name
 
             archive_location = (
-                "Disk" if is_collateral(profile, file) else essence_archive_location
+                "Disk" if is_collateral(sip_profile, file) else essence_archive_location
             )
 
             files.append(
                 {
                     #
                     # file section
-                    "id": f"FILEID-{profile.upper()}-REPRESENTATION-{rep_idx}-{file_idx}",
+                    "id": f"FILEID-{sip_profile.upper()}-REPRESENTATION-{rep_idx}-{file_idx}",
                     "original_name": file_name,
                     "checksum": file.fixity.value,
                     "archive_location": archive_location,
@@ -93,7 +112,7 @@ def create_mh_mets_data(
                     "href": f"representation_{rep_idx}/{file_name}",
                     #
                     # file DMD section
-                    "dmd_id": f"DMDID-{profile.upper()}-REPRESENTATION-{rep_idx}-{file_idx}",
+                    "dmd_id": f"DMDID-{sip_profile.upper()}-REPRESENTATION-{rep_idx}-{file_idx}",
                     "external_id": f"{pid}_{rep_idx}_{file_idx}",
                     "pid": pid,
                     "cp_id": sip.entity.maintainer.identifier,
@@ -103,17 +122,12 @@ def create_mh_mets_data(
 
     sidecar = create_mh_sidecar_data(sip)
 
-    # A meemoo VIDEO SIP with profile "film"
-    # should receive the "Basic" record type in mediahaven
-    if sip.entity.type == sippy.EntityClass.video:
-        profile = "basic"
-
     events = [transform_event(event) for event in sip.events]
 
     return {
         "mh_sidecar_version": mh_sidecar_version,
         "createdate": datetime.now().isoformat(),
-        "profile": profile,
+        "record_type": record_type,
         "pid": pid,
         "files": files,
         "ie": sip.entity,
@@ -147,7 +161,7 @@ def is_collateral(profile: str, file: sippy.File) -> bool:
 
 def write_mediahaven_sip(
     sip: sippy.SIP, config: dict[str, Any], pid: str
-) -> tuple[Path, str]:
+) -> MediaHavenSip:
     mh_sidecar_version = config["mh_sidecar_version"]
     aip_folder = config["aip_folder"]
     essence_archive_location = determine_archive_location(sip, config)
@@ -178,7 +192,7 @@ def write_mediahaven_sip(
     if should_cleanup:
         shutil.rmtree(mh_sip_path)
 
-    return mh_sip_path, mets_xml
+    return MediaHavenSip(mh_sip_path, mets_xml, mets_data["record_type"])
 
 
 def determine_archive_location(
