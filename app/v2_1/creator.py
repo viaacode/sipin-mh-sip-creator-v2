@@ -9,15 +9,14 @@ from jinja2 import Environment, FileSystemLoader
 
 import sippy
 
+from app.profile_url import parse_profile_url
 from app.v2_1.langstrings import get_nl_string
 
 from . import profiles
 
 
 def create_mh_sidecar_data(sip: sippy.SIP) -> dict:
-    splitted = sip.profile.split("/")
-    profile = splitted[-1]
-    version = splitted[-2]
+    profile, version = parse_profile_url(sip)
 
     match profile:
         case "material-artwork":
@@ -54,7 +53,7 @@ def create_mh_mets_data(
     Create the data needed to render a METS XML file.
     """
 
-    profile = str(sip.profile).split("/")[-1]
+    profile, _ = parse_profile_url(sip)
 
     files = []
 

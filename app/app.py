@@ -8,6 +8,7 @@ from viaa.observability import logging
 
 from app.services.pulsar import PulsarClient
 from app.services.pid import PidClient
+from app.profile_url import parse_profile_url
 from app.utils import get_sip_creator
 
 import sippy
@@ -89,7 +90,7 @@ class EventListener:
 
         write_mediahaven_sip_fn = get_sip_creator(sip)
         mh_sip_path, mets_xml = write_mediahaven_sip_fn(sip, self.config, pid)
-        profile = str(sip.profile).split("/")[-1]
+        profile, _ = parse_profile_url(sip)
 
         # Cursed knowlegde:
         # A meemoo VIDEO SIP with profile "film"

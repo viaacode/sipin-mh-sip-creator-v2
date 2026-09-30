@@ -5,21 +5,10 @@ from pathlib import Path
 import sippy
 
 from . import v2_1
+from .profile_url import parse_profile_url
 
 
 class MediaHavenCreatorError(Exception): ...
-
-
-type Profile = str
-type Version = str
-
-
-def parse_profile_url(sip: sippy.SIP) -> tuple[Profile, Version]:
-    splitted = sip.profile.split("/")
-    profile = splitted[-1]
-    version = splitted[-2]
-
-    return profile, version
 
 
 def get_mets_creator(sip: sippy.SIP):
