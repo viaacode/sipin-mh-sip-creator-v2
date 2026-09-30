@@ -4,7 +4,8 @@ from typing import Any
 import pytest
 
 import sippy
-from app.utils import get_mets_creator, get_sip_creator
+from app.mediahaven_sip import zip_mediahaven_sip
+from app.utils import get_mets_creator, get_mediahaven_sip_writer
 
 
 """
@@ -47,7 +48,6 @@ def config():
             "tape_content_partners": "",
             "disk_content_partners": "",
         },
-        "cleanup_sip": False,
     }
 
 
@@ -66,5 +66,7 @@ def test_create_mediahave_sip(sip_path: Path, config: dict[str, Any]):
     data = transform_sip(sip_path)
     sip = sippy.SIP.deserialize(data)
 
-    sip_creator_fn = get_sip_creator(sip)
-    sip_creator_fn(sip, config, sip.entity.identifier)
+    # Unlike create_mediahaven_sip, keep the unzipped folder for inspection
+    write_mediahaven_sip = get_mediahaven_sip_writer(sip)
+    mh_sip = write_mediahaven_sip(sip, config, sip.entity.identifier)
+    zip_mediahaven_sip(mh_sip)

@@ -1,27 +1,21 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Literal, NamedTuple
+from typing import Literal
 from typing import Any
 import shutil
-import zipfile
 
 from jinja2 import Environment, FileSystemLoader
 
 import sippy
 
+from app.mediahaven_sip import MediahavenSip
 from app.profile_url import parse_profile_url
 from app.v2_1.langstrings import get_nl_string
 
 from . import profiles
 
 
-class MediaHavenSip(NamedTuple):
-    path: Path
-    mets_xml: str
-    record_type: str
-
-
-def mh_entity_record_type(sip: sippy.SIP) -> str:
+def get_target_mh_entity_record_type(sip: sippy.SIP) -> str:
     """
     Mapping of the SIP profile to the mediahaven classification and record type
     """
@@ -72,7 +66,7 @@ def create_mh_mets_data(
     # File IDs, collateral rules and the sidecar mapping follow the SIP profile;
     # the IE's DMD section and struct map follow the MediaHaven record type.
     sip_profile, _ = parse_profile_url(sip)
-    record_type = mh_entity_record_type(sip)
+    entity_record_type = get_target_mh_entity_record_type(sip)
 
     files = []
 
@@ -127,7 +121,7 @@ def create_mh_mets_data(
     return {
         "mh_sidecar_version": mh_sidecar_version,
         "createdate": datetime.now().isoformat(),
-        "record_type": record_type,
+        "entity_record_type": entity_record_type,
         "pid": pid,
         "files": files,
         "ie": sip.entity,
@@ -161,7 +155,10 @@ def is_collateral(profile: str, file: sippy.File) -> bool:
 
 def write_mediahaven_sip(
     sip: sippy.SIP, config: dict[str, Any], pid: str
-) -> MediaHavenSip:
+) -> MediahavenSip:
+    """
+    Write the MediaHaven SIP as a folder: the METS file plus a copy of every file.
+    """
     mh_sidecar_version = config["mh_sidecar_version"]
     aip_folder = config["aip_folder"]
     essence_archive_location = determine_archive_location(sip, config)
@@ -183,16 +180,11 @@ def write_mediahaven_sip(
         dest_href.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(file["source_href"], dest_href)
 
-    with zipfile.ZipFile(mh_sip_path.with_suffix(".zip"), "w") as zf:
-        for path in mh_sip_path.rglob("*"):
-            zf.write(path, arcname=path.relative_to(mh_sip_path))
-
-    # Cleanup is default, but for testing it is usefull disable it
-    should_cleanup = config.get("cleanup_sip", True)
-    if should_cleanup:
-        shutil.rmtree(mh_sip_path)
-
-    return MediaHavenSip(mh_sip_path, mets_xml, mets_data["record_type"])
+    return MediahavenSip(
+        path=mh_sip_path,
+        mets_xml=mets_xml,
+        entity_record_type=mets_data["entity_record_type"],
+    )
 
 
 def determine_archive_location(

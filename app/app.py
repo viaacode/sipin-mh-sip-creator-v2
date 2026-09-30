@@ -8,7 +8,7 @@ from viaa.observability import logging
 
 from app.services.pulsar import PulsarClient
 from app.services.pid import PidClient
-from app.utils import get_sip_creator
+from app.utils import create_mediahaven_sip
 
 import sippy
 
@@ -87,20 +87,19 @@ class EventListener:
         sip = sippy.SIP.deserialize(event_data)
         pid = self.get_pid(sip)
 
-        write_mediahaven_sip_fn = get_sip_creator(sip)
-        mh_sip = write_mediahaven_sip_fn(sip, self.config, pid)
+        mh_sip = create_mediahaven_sip(sip, self.config, pid)
 
         # Send event on topic
         data = {
             "source": str(zip_folder_path),
             "host": self.config["host"],
             "paths": [
-                str(Path(f"{mh_sip.path}.zip")),
+                str(mh_sip.zip_path),
             ],
             "cp_id": sip.entity.maintainer.identifier,
             "type": "complex",
             # Despite the name, this is the MediaHaven record type
-            "sip_profile": mh_sip.record_type,
+            "sip_profile": mh_sip.entity_record_type,
             "pid": pid,
             "outcome": EventOutcome.SUCCESS,
             "metadata": mh_sip.mets_xml,
