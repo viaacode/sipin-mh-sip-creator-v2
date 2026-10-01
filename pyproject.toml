@@ -34,6 +34,13 @@ dev = [
     "sipin-meemoo-sip-2-transformator",
 ]
 
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.uv]
 allow-insecure-host = ["do-prd-mvn-01.do.viaa.be"]
 
@@ -47,7 +54,7 @@ url = "http://do-prd-mvn-01.do.viaa.be:8081/repository/pypi-all/simple"
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-v --ignore=tests/transformator"
-pythonpath = ["."]
+pythonpath = ["src"]
 
 [[tool.mypy.overrides]]
 module = ["untyped_package.*"]

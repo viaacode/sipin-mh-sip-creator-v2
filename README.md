@@ -34,7 +34,7 @@ Make sure to load in the ENV vars.
 
 Run the tests with:
 
-    $ uv run pytest -v --cov=./app
+    $ uv run pytest -v --cov=./src/app
 
 Run the application:
 
@@ -63,7 +63,7 @@ Make sure to load in the ENV vars.
 
 Run the tests with:
 
-    $ pytest -v --cov=./app
+    $ pytest -v --cov=./src/app
 
 Run the application:
 
@@ -77,7 +77,7 @@ Build the container:
 
 Run the tests in a container:
 
-    $ docker run --env-file .env.example --rm --entrypoint python sipin-mh-sip-creator-v2:latest -m pytest -v --cov=./app
+    $ docker run --env-file .env.example --rm --entrypoint python sipin-mh-sip-creator-v2:latest -m pytest -v --cov=./src/app
 
 Run the container (with specified `.env` file):
 
