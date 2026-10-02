@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import _pulsar
+from pulsar.exceptions import Timeout
 
 from cloudevents.events import Event, PulsarBinding, EventOutcome, EventAttributes
 from viaa.configuration import ConfigParser
@@ -128,7 +128,7 @@ class EventListener:
         while self.running:
             try:
                 msg = self.pulsar_client.receive()
-            except _pulsar.Timeout:
+            except Timeout:
                 continue
 
             try:
