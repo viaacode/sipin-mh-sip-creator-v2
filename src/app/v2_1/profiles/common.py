@@ -16,6 +16,7 @@ digitization_event_id: Final = "https://data.hetarchief.be/id/event-type/digitiz
 quality_control_event_id: Final = (
     "https://data.hetarchief.be/id/event-type/quality-control"
 )
+editing_event_id: Final = "https://data.hetarchief.be/id/event-type/editing"
 
 
 def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
@@ -75,6 +76,9 @@ def get_mh_mapping(sip: sippy.SIP) -> dict[str, Any]:
             "qc_outcome": get_event_outcome(sip, quality_control_event_id),
             "qc_note": get_event_note(sip, quality_control_event_id),
             "qc_by": get_event_implementer(sip, quality_control_event_id),
+            "editing_date": get_event_date(sip, editing_event_id),
+            "editing_outcome": get_event_outcome(sip, editing_event_id),
+            "editing_note": get_event_note(sip, editing_event_id),
             "ContentCategory": sip.mets_type,
         },
     }
