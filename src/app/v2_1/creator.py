@@ -35,6 +35,8 @@ def create_mh_sidecar_data(sip: sippy.SIP) -> dict:
             profile_module = profiles.film
         case "basic":
             profile_module = profiles.basic
+        case "bibliographic":
+            profile_module = profiles.bibliographic
         case _:
             raise ValueError(f"Unsupported profile '{profile}' for version '{version}'")
 
@@ -67,6 +69,14 @@ def create_mh_mets_data(
     # the IE's DMD section and struct map follow the MediaHaven record type.
     sip_profile, _ = parse_profile_url(sip)
     entity_record_type = get_target_mh_entity_record_type(sip)
+
+    # base.jinja has no struct map for it yet, so the METS would have none.
+    # The newspaper ETL needs a Newspaper record with NewspaperPage children,
+    # and how MediaHaven derives those from the METS is still to be decided.
+    if entity_record_type == "bibliographic":
+        raise NotImplementedError(
+            "MediaHaven METS for the bibliographic profile: no struct map yet"
+        )
 
     files = []
 
