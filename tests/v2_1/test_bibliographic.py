@@ -61,6 +61,13 @@ def test_newspaper_sidecar():
         ("multiselect", "amateurkrant"),
     ]
     assert ("Trefwoord", "katten") in sidecar["Dynamic"]["dc_subjects"]
+    assert sidecar["Dynamic"]["dcterms_created"] == "XXXX"
+    assert sidecar["Dynamic"]["dcterms_issued"] == "2022-08-02"
+    assert sidecar["Dynamic"]["dc_rights_licenses"] == [
+        ("multiselect", "VIAA-PUBLIEK-METADATA-LTD")
+    ]
+    assert sidecar["Dynamic"]["dc_coverages"] == [("ruimte", "Gent, België")]
+    assert sidecar["Dynamic"]["dc_identifier_localid"] == "CHATBLANC_2022_001"
 
 
 def test_mets_not_implemented(sip: sippy.SIP):
