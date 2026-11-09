@@ -57,8 +57,8 @@ def test_newspaper_sidecar():
 
     assert sidecar["Descriptive"]["mh:Title"] == "Le Chat Blanc"
     assert sidecar["Dynamic"]["dc_types"] == [
-        ("multiselect", "newspaper"),
-        ("multiselect", "amateur newspapers"),
+        ("multiselect", "krant"),
+        ("multiselect", "amateurkrant"),
     ]
     assert ("Trefwoord", "katten") in sidecar["Dynamic"]["dc_subjects"]
 
